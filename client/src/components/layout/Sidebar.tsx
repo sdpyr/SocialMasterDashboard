@@ -185,26 +185,69 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="windows-sidebar">
-      <div className="space-y-1">
-        {navigationItems.map((item, index) => (
-          <div key={index} className="sidebar-section">
-            {renderNavItem(item)}
-            
-            {item.items && (
-              <div className="pl-4 space-y-1 mt-1">
-                {item.items.map((subItem, subIndex) => (
-                  <Link key={subIndex} to={subItem.path || "#"}>
-                    <div className={`sidebar-item ${subItem.isActive ? 'bg-neutral-200' : ''}`}>
-                      {renderIcon(subItem.icon)}
-                      <span>{subItem.label}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+    <div className="bg-white h-full shadow-sm" style={{ width: '240px' }}>
+      <div className="px-3 pt-6 pb-3">
+        <div className="flex items-center px-2 mb-6">
+          <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center mr-2">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 24 24" 
+              fill="currentColor" 
+              className="w-5 h-5 text-primary"
+            >
+              <path d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75c-1.036 0-1.875-.84-1.875-1.875V8.625zM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75c-1.036 0-1.875-.84-1.875-1.875v-6.75z" />
+            </svg>
           </div>
-        ))}
+          <div>
+            <h2 className="font-semibold text-slate-800">SocialMaster</h2>
+            <p className="text-xs text-slate-500">Dashboard v1.0</p>
+          </div>
+        </div>
+        
+        <div className="space-y-6">
+          {navigationItems.map((item, index) => (
+            <div key={index} className="sidebar-section">
+              {item.label && !item.items && (
+                <div className="sidebar-header">{item.label}</div>
+              )}
+              
+              {item.items ? (
+                <>
+                  <div className="sidebar-header">{item.label}</div>
+                  <div className="space-y-1">
+                    {item.items.map((subItem, subIndex) => (
+                      <Link key={subIndex} to={subItem.path || "#"}>
+                        <div className={`sidebar-item ${subItem.isActive ? 'active' : ''}`}>
+                          {renderIcon(subItem.icon)}
+                          <span>{subItem.label}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <Link to={item.path || "#"}>
+                  <div className={`sidebar-item ${item.isActive ? 'active' : ''}`}>
+                    {renderIcon(item.icon)}
+                    <span>{item.label}</span>
+                  </div>
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="mt-auto border-t border-slate-200 p-4">
+        <div className="flex items-center p-2 rounded-sm hover:bg-slate-100 transition-colors cursor-pointer">
+          <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center font-medium mr-3">
+            AD
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-800">Demo Kullanıcı</p>
+            <p className="text-xs text-slate-500">demo@example.com</p>
+          </div>
+        </div>
       </div>
     </div>
   );

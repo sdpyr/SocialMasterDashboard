@@ -9,102 +9,73 @@ interface AddressBarProps {
 
 export default function AddressBar({ breadcrumbs, searchQuery, onSearchChange }: AddressBarProps) {
   return (
-    <div className="windows-addressbar">
-      <div className="flex items-center space-x-2 mr-4">
-        <button className="text-neutral-600 hover:bg-neutral-200 rounded p-1" aria-label="Back">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 111.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z"
-              clipRule="evenodd"
+    <div className="bg-white px-6 py-4 border-b border-slate-200">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <h2 className="text-xl font-semibold text-slate-800 mr-6">
+            {breadcrumbs.length > 0 && breadcrumbs[breadcrumbs.length - 1].label}
+          </h2>
+          
+          <nav className="flex" aria-label="Breadcrumb">
+            <ol className="flex items-center space-x-1">
+              {breadcrumbs.map((item, index) => (
+                <li key={index} className="flex items-center">
+                  {index > 0 && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-slate-400 mx-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  )}
+                  <a 
+                    href="#" 
+                    className={`text-sm ${
+                      item.isActive 
+                        ? "text-primary font-medium" 
+                        : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Hızlı ara..."
+              className="flat-input pr-8 w-60"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
-          </svg>
-        </button>
-        <button className="text-neutral-600 hover:bg-neutral-200 rounded p-1" aria-label="Forward">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              fillRule="evenodd"
-              d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-        <button className="text-neutral-600 hover:bg-neutral-200 rounded p-1" aria-label="Up">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              fillRule="evenodd"
-              d="M11.47 7.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 01-1.06-1.06l7.5-7.5z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-
-      <div className="flex-1 flex items-center text-sm">
-        {breadcrumbs.map((item, index) => (
-          <div key={index} className="flex items-center">
-            {index > 0 && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="mx-1 text-neutral-400 w-3 h-3"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
-                  clipRule="evenodd"
-                />
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
-            )}
-            <span className={item.isActive ? "font-medium" : "text-neutral-500"}>
-              {item.label}
-            </span>
+            </div>
           </div>
-        ))}
-      </div>
-
-      <div className="flex items-center ml-2">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Ara: SocialMasterDashboard"
-            className="border border-neutral-300 rounded px-2 py-1 w-64 text-sm"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-          <button
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-neutral-500"
-            aria-label="Search"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+          
+          <div className="flex">
+            <button className="p-2 text-slate-500 hover:text-primary hover:bg-slate-100 rounded-sm transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+            </button>
+            
+            <button className="p-2 text-slate-500 hover:text-primary hover:bg-slate-100 rounded-sm transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
