@@ -17,6 +17,18 @@ import {
   Trash2
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import type { SocialAccount, User } from '@shared/schema';
 
 // Platform icons
@@ -217,6 +229,9 @@ export default function AdminPanel() {
           <TabsTrigger value="social-accounts">Sosyal Medya</TabsTrigger>
           <TabsTrigger value="ads">Reklam Yönetimi</TabsTrigger>
           <TabsTrigger value="analytics">Analitik</TabsTrigger>
+          <TabsTrigger value="seo">SEO</TabsTrigger>
+          <TabsTrigger value="plans">Ücretli Planlar</TabsTrigger>
+          <TabsTrigger value="pages">Sayfalar</TabsTrigger>
         </TabsList>
         
         <TabsContent value="ui-settings">
@@ -946,6 +961,613 @@ export default function AdminPanel() {
             <CardFooter className="flex justify-end">
               <Button>Analitik Ayarlarını Kaydet</Button>
             </CardFooter>
+          </Card>
+        </TabsContent>
+
+        {/* SEO Sekmesi */}
+        <TabsContent value="seo">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>SEO Ayarları</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => console.log('Yenileniyor...')}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Yenile
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* Genel SEO Ayarları */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Genel SEO Ayarları</h3>
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="site-title">Site Başlığı</Label>
+                    <Input id="site-title" placeholder="SocialMasterDashboard - Sosyal Medya Yönetim Platformu" />
+                    <p className="text-sm text-gray-500">Google arama sonuçlarında görünecek başlık</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="meta-description">Meta Açıklaması</Label>
+                    <Textarea 
+                      id="meta-description" 
+                      placeholder="SocialMasterDashboard ile tüm sosyal medya hesaplarınızı tek bir yerden yönetin, içerik planlayın, analitikleri takip edin." 
+                      className="h-20"
+                    />
+                    <p className="text-sm text-gray-500">Google arama sonuçlarında görünecek açıklama (max 160 karakter)</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="meta-keywords">Meta Anahtar Kelimeleri</Label>
+                    <Input id="meta-keywords" placeholder="sosyal medya, sosyal medya yönetimi, içerik planlama, analitik" />
+                    <p className="text-sm text-gray-500">Anahtar kelimeleri virgülle ayırın</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="robots-txt">Robots.txt İçeriği</Label>
+                    <Textarea 
+                      id="robots-txt" 
+                      className="h-32 font-mono"
+                      defaultValue={`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /settings\n\nSitemap: https://socialmaster.example.com/sitemap.xml`}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sosyal Medya Meta Etiketleri */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Sosyal Medya Meta Etiketleri</h3>
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="og-title">Open Graph Başlığı</Label>
+                    <Input id="og-title" placeholder="SocialMasterDashboard - Sosyal Medya Yönetim Platformu" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="og-description">Open Graph Açıklaması</Label>
+                    <Textarea 
+                      id="og-description" 
+                      placeholder="SocialMasterDashboard ile tüm sosyal medya hesaplarınızı tek bir yerden yönetin." 
+                      className="h-20"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="og-image">Open Graph Resmi</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input id="og-image" type="file" accept=".png,.jpg,.jpeg" />
+                      <Button variant="outline" size="sm">Yükle</Button>
+                    </div>
+                    <p className="text-sm text-gray-500">Önerilen boyut: 1200x630 piksel</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter-card">Twitter Kart Tipi</Label>
+                    <Select defaultValue="summary_large_image">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Bir kart tipi seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="summary">Summary</SelectItem>
+                        <SelectItem value="summary_large_image">Summary Large Image</SelectItem>
+                        <SelectItem value="app">App</SelectItem>
+                        <SelectItem value="player">Player</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gelişmiş SEO Ayarları */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Gelişmiş SEO Ayarları</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Canonical URL</Label>
+                    <div className="flex items-center space-x-2">
+                      <Switch id="canonical-url" defaultChecked />
+                      <Label htmlFor="canonical-url">Canonical URL'leri etkinleştir</Label>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>XML Sitemap</Label>
+                    <div className="flex items-center space-x-2">
+                      <Switch id="auto-sitemap" defaultChecked />
+                      <Label htmlFor="auto-sitemap">Otomatik sitemap oluştur</Label>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Structured Data</Label>
+                    <div className="flex items-center space-x-2">
+                      <Switch id="structured-data" defaultChecked />
+                      <Label htmlFor="structured-data">Schema.org markup ekle</Label>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Google Analytics</Label>
+                    <div className="flex items-center space-x-2">
+                      <Switch id="ga-enabled" defaultChecked />
+                      <Label htmlFor="ga-enabled">Google Analytics'i etkinleştir</Label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="ga-id">Google Analytics ID</Label>
+                  <Input id="ga-id" placeholder="UA-XXXXXXXXX-X veya G-XXXXXXXXXX" />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="gtm-id">Google Tag Manager ID</Label>
+                  <Input id="gtm-id" placeholder="GTM-XXXXXXX" />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="custom-head">Özel Head Kodu</Label>
+                  <Textarea 
+                    id="custom-head" 
+                    className="h-32 font-mono"
+                    placeholder="<!-- Buraya eklenecek kod <head> etiketinin içine yerleştirilecektir -->"
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline">Varsayılana Sıfırla</Button>
+              <Button>Değişiklikleri Kaydet</Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        {/* Ücretli Planlar Sekmesi */}
+        <TabsContent value="plans">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Ücretli Plan Yönetimi</CardTitle>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm" onClick={() => console.log('Yenileniyor...')}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Yenile
+                </Button>
+                <Button size="sm" onClick={() => console.log('Yeni plan ekleniyor...')}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Yeni Plan
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Mevcut Planlar Tablosu */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Plan Adı</TableHead>
+                    <TableHead>Fiyat</TableHead>
+                    <TableHead>Fatura Döngüsü</TableHead>
+                    <TableHead>Özellikler</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead className="text-right">İşlemler</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[
+                    { 
+                      id: 1, 
+                      name: 'Free', 
+                      price: 0, 
+                      cycle: 'monthly', 
+                      features: ['5 sosyal medya hesabı', '1 kullanıcı', 'Temel analitik'], 
+                      status: 'active' 
+                    },
+                    { 
+                      id: 2, 
+                      name: 'Premium', 
+                      price: 9.99, 
+                      cycle: 'monthly', 
+                      features: ['20 sosyal medya hesabı', '3 kullanıcı', 'Gelişmiş analitik', 'İçerik planlama'], 
+                      status: 'active' 
+                    },
+                    { 
+                      id: 3, 
+                      name: 'Pro', 
+                      price: 19.99, 
+                      cycle: 'monthly', 
+                      features: ['Sınırsız sosyal medya hesabı', '10 kullanıcı', 'Tüm özellikler'], 
+                      status: 'active' 
+                    },
+                    { 
+                      id: 4, 
+                      name: 'Enterprise', 
+                      price: 99.99, 
+                      cycle: 'monthly', 
+                      features: ['Sınırsız sosyal medya hesabı', 'Sınırsız kullanıcı', 'Tüm özellikler', 'Öncelikli destek'], 
+                      status: 'draft' 
+                    }
+                  ].map(plan => (
+                    <TableRow key={plan.id}>
+                      <TableCell className="font-medium">{plan.id}</TableCell>
+                      <TableCell>{plan.name}</TableCell>
+                      <TableCell>
+                        {plan.price === 0 ? 'Ücretsiz' : `$${plan.price.toFixed(2)}`}
+                      </TableCell>
+                      <TableCell>
+                        {plan.cycle === 'monthly' ? 'Aylık' : 
+                         plan.cycle === 'yearly' ? 'Yıllık' : 
+                         plan.cycle === 'quarterly' ? '3 Aylık' : plan.cycle}
+                      </TableCell>
+                      <TableCell>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm">Özellikleri Gör</Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-2">
+                              <h4 className="font-medium">{plan.name} Plan Özellikleri</h4>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {plan.features.map((feature, i) => (
+                                  <li key={i} className="text-sm">{feature}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </TableCell>
+                      <TableCell>
+                        {plan.status === 'active' ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            Aktif
+                          </span>
+                        ) : plan.status === 'draft' ? (
+                          <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
+                            Taslak
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                            Pasif
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => console.log('Plan düzenleniyor:', plan.id)}
+                          >
+                            Düzenle
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                            onClick={() => console.log('Plan siliniyor:', plan.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Planları Karşılaştır Tablosu */}
+              <div className="mt-8">
+                <h3 className="text-lg font-medium mb-4">Plan Karşılaştırma Tablosu</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Özellik</TableHead>
+                      <TableHead>Free</TableHead>
+                      <TableHead>Premium</TableHead>
+                      <TableHead>Pro</TableHead>
+                      <TableHead>Enterprise</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      { feature: 'Sosyal Medya Hesapları', free: '5', premium: '20', pro: 'Sınırsız', enterprise: 'Sınırsız' },
+                      { feature: 'Kullanıcı Sayısı', free: '1', premium: '3', pro: '10', enterprise: 'Sınırsız' },
+                      { feature: 'İçerik Planlama', free: '✓', premium: '✓', pro: '✓', enterprise: '✓' },
+                      { feature: 'Otomatik Yayınlama', free: '✓', premium: '✓', pro: '✓', enterprise: '✓' },
+                      { feature: 'Temel Analitik', free: '✓', premium: '✓', pro: '✓', enterprise: '✓' },
+                      { feature: 'Gelişmiş Analitik', free: '✗', premium: '✓', pro: '✓', enterprise: '✓' },
+                      { feature: 'Rakip Analizi', free: '✗', premium: '✗', pro: '✓', enterprise: '✓' },
+                      { feature: 'Özel Raporlar', free: '✗', premium: '✗', pro: '✓', enterprise: '✓' },
+                      { feature: 'API Erişimi', free: '✗', premium: '✗', pro: '✓', enterprise: '✓' },
+                      { feature: 'Öncelikli Destek', free: '✗', premium: '✗', pro: '✗', enterprise: '✓' },
+                      { feature: 'White Label', free: '✗', premium: '✗', pro: '✗', enterprise: '✓' }
+                    ].map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{row.feature}</TableCell>
+                        <TableCell className="text-center">{row.free}</TableCell>
+                        <TableCell className="text-center">{row.premium}</TableCell>
+                        <TableCell className="text-center">{row.pro}</TableCell>
+                        <TableCell className="text-center">{row.enterprise}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Promosyon Kodları */}
+              <div className="mt-8">
+                <h3 className="text-lg font-medium mb-4">Promosyon Kodu Yönetimi</h3>
+                <div className="flex mb-4 justify-end">
+                  <Button size="sm" onClick={() => console.log('Yeni promosyon kodu ekleniyor...')}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Yeni Promosyon Kodu
+                  </Button>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kod</TableHead>
+                      <TableHead>İndirim</TableHead>
+                      <TableHead>Plan</TableHead>
+                      <TableHead>Geçerlilik</TableHead>
+                      <TableHead>Kullanım</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead className="text-right">İşlemler</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      { 
+                        code: 'WELCOME2025', 
+                        discount: '%20', 
+                        plan: 'Premium', 
+                        validity: '01/05/2025 - 31/05/2025', 
+                        usage: '0/50',
+                        status: 'active'
+                      },
+                      { 
+                        code: 'SUMMER25', 
+                        discount: '%25', 
+                        plan: 'Tümü', 
+                        validity: '01/06/2025 - 31/08/2025', 
+                        usage: '0/100',
+                        status: 'inactive'
+                      }
+                    ].map((promo, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{promo.code}</TableCell>
+                        <TableCell>{promo.discount}</TableCell>
+                        <TableCell>{promo.plan}</TableCell>
+                        <TableCell>{promo.validity}</TableCell>
+                        <TableCell>{promo.usage}</TableCell>
+                        <TableCell>
+                          {promo.status === 'active' ? (
+                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                              Aktif
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                              Pasif
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => console.log('Promosyon kodu düzenleniyor:', promo.code)}
+                            >
+                              Düzenle
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                              onClick={() => console.log('Promosyon kodu siliniyor:', promo.code)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button>Değişiklikleri Kaydet</Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        {/* Sayfalar Sekmesi */}
+        <TabsContent value="pages">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Sayfa Yönetimi</CardTitle>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm" onClick={() => console.log('Yenileniyor...')}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Yenile
+                </Button>
+                <Button size="sm" onClick={() => console.log('Yeni sayfa ekleniyor...')}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Yeni Sayfa
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Sayfalar Tablosu */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Başlık</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Tip</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead>Son Güncelleme</TableHead>
+                    <TableHead className="text-right">İşlemler</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[
+                    { 
+                      title: 'Anasayfa', 
+                      slug: '/', 
+                      type: 'system', 
+                      status: 'published',
+                      updated: '12/03/2025'
+                    },
+                    { 
+                      title: 'Hakkımızda', 
+                      slug: '/about', 
+                      type: 'custom', 
+                      status: 'published',
+                      updated: '15/03/2025'
+                    },
+                    { 
+                      title: 'Kullanım Koşulları', 
+                      slug: '/terms', 
+                      type: 'legal', 
+                      status: 'published',
+                      updated: '10/03/2025'
+                    },
+                    { 
+                      title: 'Gizlilik Politikası', 
+                      slug: '/privacy', 
+                      type: 'legal', 
+                      status: 'published',
+                      updated: '10/03/2025'
+                    },
+                    { 
+                      title: 'SSS', 
+                      slug: '/faq', 
+                      type: 'custom', 
+                      status: 'draft',
+                      updated: '20/03/2025'
+                    },
+                    { 
+                      title: 'İletişim', 
+                      slug: '/contact', 
+                      type: 'system', 
+                      status: 'published',
+                      updated: '18/03/2025'
+                    }
+                  ].map((page, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{page.title}</TableCell>
+                      <TableCell>{page.slug}</TableCell>
+                      <TableCell>
+                        {page.type === 'system' ? (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                            Sistem
+                          </span>
+                        ) : page.type === 'legal' ? (
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                            Yasal
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                            Özel
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {page.status === 'published' ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            Yayında
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
+                            Taslak
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>{page.updated}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => console.log('Sayfa düzenleniyor:', page.title)}
+                          >
+                            Düzenle
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => console.log('Sayfa görüntüleniyor:', page.slug)}
+                          >
+                            Görüntüle
+                          </Button>
+                          {page.type !== 'system' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                              onClick={() => console.log('Sayfa siliniyor:', page.title)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Sayfa Şablonları */}
+              <div className="mt-8">
+                <h3 className="text-lg font-medium mb-4">Sayfa Şablonları</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    {
+                      title: 'Standart Sayfa',
+                      description: 'Başlık, içerik ve isteğe bağlı görseller olan temel sayfa düzeni',
+                      img: '📄'
+                    },
+                    {
+                      title: 'Yasal Doküman',
+                      description: 'Yasal metinler için bölümlere ayrılmış, numaralandırılmış düzen',
+                      img: '📜'
+                    },
+                    {
+                      title: 'Hakkımızda',
+                      description: 'Ekip üyeleri, şirket bilgileri ve misyon görünümü için düzen',
+                      img: '🏢'
+                    },
+                    {
+                      title: 'İletişim Sayfası',
+                      description: 'İletişim formu, adres bilgileri ve harita içeren düzen',
+                      img: '📞'
+                    },
+                    {
+                      title: 'SSS Sayfası',
+                      description: 'Akordiyon şeklinde sık sorulan sorular düzeni',
+                      img: '❓'
+                    },
+                    {
+                      title: 'Boş Sayfa',
+                      description: 'Tasarımcı tarafından özelleştirilebilecek boş sayfa',
+                      img: '✨'
+                    }
+                  ].map((template, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <CardHeader className="pb-2">
+                        <div className="text-4xl text-center mb-2">{template.img}</div>
+                        <CardTitle className="text-center">{template.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm text-center text-gray-600">
+                        {template.description}
+                      </CardContent>
+                      <CardFooter className="flex justify-center pb-4">
+                        <Button variant="outline" size="sm">Bu Şablonu Kullan</Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
