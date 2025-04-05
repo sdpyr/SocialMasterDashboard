@@ -263,7 +263,7 @@ export default function PostsPage() {
                       <tr key={post.id} className="hover:bg-slate-50/50">
                         <td className="px-4 py-4">
                           <div className="max-w-xs truncate text-sm font-medium text-slate-700">{post.content}</div>
-                          {post.mediaUrl && (
+                          {post.mediaUrls && post.mediaUrls.length > 0 && (
                             <div className="text-xs text-slate-500 mt-1">
                               <span className="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">

@@ -203,11 +203,11 @@ export default function AccountsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs text-slate-500">Gönderi</span>
-                      <span className="text-xs font-medium">{account.postCount || '0'}</span>
+                      <span className="text-xs font-medium">0</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs text-slate-500">Etkileşim</span>
-                      <span className="text-xs font-medium">{account.engagementRate || '0%'}</span>
+                      <span className="text-xs font-medium">0%</span>
                     </div>
                   </div>
                 </div>

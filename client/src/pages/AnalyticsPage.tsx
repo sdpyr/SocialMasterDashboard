@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
                   <p className="text-sm text-slate-500">{timeRange === 'week' ? 'Son 7 gün analizi' : timeRange === 'month' ? 'Son 30 gün analizi' : timeRange === 'quarter' ? 'Son 3 ay analizi' : 'Son 1 yıl analizi'}</p>
                 </div>
                 <div className="badge badge-primary">
-                  {latestMetrics?.followers > (analytics[1]?.followers || 0) ? 'Yükseliyor' : 'Düşüşte'}
+                  {(latestMetrics?.followers || 0) > (analytics[1]?.followers || 0) ? 'Yükseliyor' : 'Düşüşte'}
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="stat-card">
               <div className="stat-title">Takipçi Sayısı</div>
-              <div className="stat-value">{latestMetrics?.followers.toLocaleString()}</div>
+              <div className="stat-value">{(latestMetrics?.followers || 0).toLocaleString()}</div>
               <div className={`stat-change ${(latestMetrics?.followers || 0) - (analytics[1]?.followers || 0) >= 0 ? 'stat-change-positive' : 'stat-change-negative'}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   {(latestMetrics?.followers || 0) - (analytics[1]?.followers || 0) >= 0 ? (
@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
             
             <div className="stat-card">
               <div className="stat-title">Etkileşim</div>
-              <div className="stat-value">{latestMetrics?.engagement.toLocaleString()}</div>
+              <div className="stat-value">{(latestMetrics?.engagement || 0).toLocaleString()}</div>
               <div className={`stat-change ${(latestMetrics?.engagement || 0) - (analytics[1]?.engagement || 0) >= 0 ? 'stat-change-positive' : 'stat-change-negative'}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   {(latestMetrics?.engagement || 0) - (analytics[1]?.engagement || 0) >= 0 ? (
@@ -173,7 +173,7 @@ export default function AnalyticsPage() {
             
             <div className="stat-card">
               <div className="stat-title">Erişim</div>
-              <div className="stat-value">{latestMetrics?.reach.toLocaleString()}</div>
+              <div className="stat-value">{(latestMetrics?.reach || 0).toLocaleString()}</div>
               <div className={`stat-change ${(latestMetrics?.reach || 0) - (analytics[1]?.reach || 0) >= 0 ? 'stat-change-positive' : 'stat-change-negative'}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   {(latestMetrics?.reach || 0) - (analytics[1]?.reach || 0) >= 0 ? (
@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
             
             <div className="stat-card">
               <div className="stat-title">Profil Ziyareti</div>
-              <div className="stat-value">{latestMetrics?.profileVisits.toLocaleString()}</div>
+              <div className="stat-value">{(latestMetrics?.profileVisits || 0).toLocaleString()}</div>
               <div className={`stat-change ${(latestMetrics?.profileVisits || 0) - (analytics[1]?.profileVisits || 0) >= 0 ? 'stat-change-positive' : 'stat-change-negative'}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   {(latestMetrics?.profileVisits || 0) - (analytics[1]?.profileVisits || 0) >= 0 ? (
