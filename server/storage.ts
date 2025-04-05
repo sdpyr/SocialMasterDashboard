@@ -5,7 +5,7 @@ import {
   analytics, type Analytics, type InsertAnalytics
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 // Interface for all storage operations
 export interface IStorage {
@@ -108,11 +108,11 @@ export class DatabaseStorage implements IStorage {
   
   async updatePost(id: number, postUpdate: Partial<InsertPost>): Promise<Post | undefined> {
     // If status changed to published, set publishedAt
-    let updateData = { ...postUpdate };
+    let updateData: Record<string, any> = { ...postUpdate };
     if (postUpdate.status === 'published') {
       const [existingPost] = await db.select().from(posts).where(eq(posts.id, id));
       if (existingPost && existingPost.status !== 'published') {
-        updateData = { ...updateData, publishedAt: new Date() };
+        updateData.publishedAt = new Date();
       }
     }
     
@@ -139,20 +139,19 @@ export class DatabaseStorage implements IStorage {
   async getAnalyticsForDate(accountId: number, date: Date): Promise<Analytics | undefined> {
     const targetDate = new Date(date);
     targetDate.setHours(0, 0, 0, 0); // Set to start of day
-    const nextDay = new Date(targetDate);
-    nextDay.setDate(nextDay.getDate() + 1);
+    
+    // Convert to YYYY-MM-DD format for date comparison
+    const formattedDate = targetDate.toISOString().split('T')[0];
     
     const [result] = await db.select()
       .from(analytics)
       .where(
         and(
           eq(analytics.accountId, accountId),
-          and(
-            date => date >= targetDate,
-            date => date < nextDay
-          )
+          sql`DATE(${analytics.date}) = ${formattedDate}`
         )
       );
+    
     return result || undefined;
   }
   
@@ -186,211 +185,150 @@ export class DatabaseStorage implements IStorage {
       }).returning();
       
       // Create sample social accounts
-      fullName: "Demo User",
-      email: "demo@example.com",
-      avatar: null,
-      createdAt: new Date(),
-    };
-    this.users.set(this.currentUserId, demoUser);
-    this.currentUserId++;
-    
-    // Add sample social accounts
-    const platforms = ["twitter", "instagram", "facebook", "linkedin", "youtube"];
-    platforms.forEach(platform => {
-      const account: SocialAccount = {
-        id: this.currentAccountId,
-        userId: 1,
-        platform,
-        accountName: `demo_${platform}`,
-        accountId: `${platform}_123456`,
-        accessToken: `token_${platform}`,
-        refreshToken: `refresh_${platform}`,
-        tokenExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        profilePicture: null,
-        followerCount: Math.floor(Math.random() * 10000),
-        followingCount: Math.floor(Math.random() * 1000),
-        isActive: true,
-        lastSync: new Date(),
-        createdAt: new Date(),
-      };
-      this.socialAccounts.set(this.currentAccountId, account);
-      this.currentAccountId++;
-    });
-    
-    // Add sample posts
-    const statuses = ["draft", "scheduled", "published", "failed"];
-    for (let i = 1; i <= 5; i++) {
-      for (let j = 0; j < 3; j++) {
-        const post: Post = {
-          id: this.currentPostId,
-          accountId: i,
-          content: `Sample post ${j+1} for account ${i}`,
-          mediaUrls: [],
-          postUrl: null,
-          scheduledFor: j === 1 ? new Date(Date.now() + 86400000) : null, // 1 day from now if scheduled
-          publishedAt: j === 2 ? new Date() : null, // Today if published
-          status: statuses[j],
-          platform: Array.from(this.socialAccounts.values()).find(a => a.id === i)?.platform || "unknown",
-          engagement: j === 2 ? { likes: Math.floor(Math.random() * 100), comments: Math.floor(Math.random() * 20), shares: Math.floor(Math.random() * 10) } : null,
-          createdAt: new Date(),
-        };
-        this.posts.set(this.currentPostId, post);
-        this.currentPostId++;
-      }
-    }
-    
-    // Add sample analytics
-    for (let i = 1; i <= 5; i++) {
-      for (let j = 0; j < 7; j++) { // Last 7 days
-        const date = new Date();
-        date.setDate(date.getDate() - j);
+      const platforms = ["twitter", "instagram", "facebook", "linkedin", "youtube"];
+      for (const platform of platforms) {
+        const index = platforms.indexOf(platform);
         
-        const analyticsEntry: Analytics = {
-          id: this.currentAnalyticsId,
-          accountId: i,
-          date,
-          followers: 1000 + Math.floor(Math.random() * 100) * j,
-          following: 500 + Math.floor(Math.random() * 50) * j,
-          engagement: Math.floor(Math.random() * 500),
-          impressions: 2000 + Math.floor(Math.random() * 1000),
-          reach: 1500 + Math.floor(Math.random() * 800),
-          profileVisits: 300 + Math.floor(Math.random() * 100),
-          clickThroughs: 50 + Math.floor(Math.random() * 30),
-          data: { 
-            postEngagement: Math.random() * 0.1,
-            storyViews: Math.floor(Math.random() * 200),
-            videoWatches: Math.floor(Math.random() * 150)
-          },
-          createdAt: new Date(),
-        };
-        this.analytics.set(this.currentAnalyticsId, analyticsEntry);
-        this.currentAnalyticsId++;
+        const [account] = await db.insert(socialAccounts).values({
+          userId: demoUser.id,
+          platform,
+          accountName: `demo_${platform}`,
+          accountId: `${platform}_123456`,
+          profilePicture: `https://ui-avatars.com/api/?name=${platform}&background=0D8ABC&color=fff`,
+          followerCount: 1000 + (index * 500),
+          followingCount: 500 + (index * 200),
+          isActive: true,
+          lastSync: new Date()
+        }).returning();
+        
+        // Create sample posts
+        const statuses = ["draft", "scheduled", "published"];
+        for (let i = 0; i < 3; i++) {
+          await db.insert(posts).values({
+            accountId: account.id,
+            content: `Örnek gönderi ${i+1} - ${platform} için`,
+            mediaUrls: [],
+            postUrl: i === 2 ? `https://${platform}.com/demo/${Date.now() + i}` : null,
+            scheduledFor: i === 1 ? new Date(Date.now() + (i * 24 * 60 * 60 * 1000)) : null,
+            publishedAt: i === 2 ? new Date(Date.now() - (i * 24 * 60 * 60 * 1000)) : null,
+            status: statuses[i],
+            platform,
+            engagement: i === 2 ? { likes: 50 + Math.floor(Math.random() * 100), comments: 5 + Math.floor(Math.random() * 20) } : null
+          });
+        }
+        
+        // Create sample analytics for the past 7 days
+        for (let i = 0; i < 7; i++) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          date.setHours(0, 0, 0, 0);
+          
+          await db.insert(analytics).values({
+            accountId: account.id,
+            date,
+            followers: (account.followerCount || 1000) - (i * 10),
+            following: account.followingCount || 500,
+            engagement: 50 + Math.floor(Math.random() * 100),
+            impressions: 500 + Math.floor(Math.random() * 1000),
+            reach: 300 + Math.floor(Math.random() * 800),
+            profileVisits: 50 + Math.floor(Math.random() * 200),
+            clickThroughs: 10 + Math.floor(Math.random() * 50),
+            data: {
+              storyViews: 100 + Math.floor(Math.random() * 300),
+              postEngagement: 0.01 + (Math.random() * 0.05)
+            }
+          });
+        }
       }
+      
+      console.log("Demo data seeded successfully");
+    } catch (error) {
+      console.error("Error seeding demo data:", error);
     }
-  }
-
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id, createdAt: new Date() };
-    this.users.set(id, user);
-    return user;
-  }
-
-  // Social Account methods
-  async getSocialAccounts(userId: number): Promise<SocialAccount[]> {
-    return Array.from(this.socialAccounts.values()).filter(
-      (account) => account.userId === userId
-    );
-  }
-
-  async getSocialAccount(id: number): Promise<SocialAccount | undefined> {
-    return this.socialAccounts.get(id);
-  }
-
-  async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
-    const id = this.currentAccountId++;
-    const newAccount: SocialAccount = { 
-      ...account, 
-      id, 
-      followerCount: 0,
-      followingCount: 0,
-      lastSync: new Date(),
-      createdAt: new Date() 
-    };
-    this.socialAccounts.set(id, newAccount);
-    return newAccount;
-  }
-
-  async updateSocialAccount(id: number, accountUpdate: Partial<InsertSocialAccount>): Promise<SocialAccount | undefined> {
-    const existingAccount = this.socialAccounts.get(id);
-    if (!existingAccount) return undefined;
-    
-    const updatedAccount = { ...existingAccount, ...accountUpdate };
-    this.socialAccounts.set(id, updatedAccount);
-    return updatedAccount;
-  }
-
-  async deleteSocialAccount(id: number): Promise<boolean> {
-    return this.socialAccounts.delete(id);
-  }
-
-  // Post methods
-  async getPosts(accountId: number): Promise<Post[]> {
-    return Array.from(this.posts.values()).filter(
-      (post) => post.accountId === accountId
-    );
-  }
-
-  async getPost(id: number): Promise<Post | undefined> {
-    return this.posts.get(id);
-  }
-
-  async createPost(post: InsertPost): Promise<Post> {
-    const id = this.currentPostId++;
-    const newPost: Post = { 
-      ...post, 
-      id, 
-      publishedAt: null,
-      engagement: null,
-      createdAt: new Date() 
-    };
-    this.posts.set(id, newPost);
-    return newPost;
-  }
-
-  async updatePost(id: number, postUpdate: Partial<InsertPost>): Promise<Post | undefined> {
-    const existingPost = this.posts.get(id);
-    if (!existingPost) return undefined;
-    
-    const updatedPost = { ...existingPost, ...postUpdate };
-    this.posts.set(id, updatedPost);
-    return updatedPost;
-  }
-
-  async deletePost(id: number): Promise<boolean> {
-    return this.posts.delete(id);
-  }
-
-  // Analytics methods
-  async getAnalytics(accountId: number): Promise<Analytics[]> {
-    return Array.from(this.analytics.values())
-      .filter(analytics => analytics.accountId === accountId)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
-  }
-
-  async getAnalyticsForDate(accountId: number, date: Date): Promise<Analytics | undefined> {
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
-    
-    return Array.from(this.analytics.values()).find(
-      (a) => a.accountId === accountId && 
-             a.date.getDate() === targetDate.getDate() &&
-             a.date.getMonth() === targetDate.getMonth() &&
-             a.date.getFullYear() === targetDate.getFullYear()
-    );
-  }
-
-  async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
-    const id = this.currentAnalyticsId++;
-    const newAnalytics: Analytics = { 
-      ...analyticsData, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.analytics.set(id, newAnalytics);
-    return newAnalytics;
   }
 }
 
-export const storage = new MemStorage();
+// In-memory implementation class for backwards compatibility
+export class MemStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async createUser(user: InsertUser): Promise<User> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    throw new Error("MemStorage is deprecated");
+  }
+  
+  async getSocialAccounts(userId: number): Promise<SocialAccount[]> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return [];
+  }
+  
+  async getSocialAccount(id: number): Promise<SocialAccount | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    throw new Error("MemStorage is deprecated");
+  }
+  
+  async updateSocialAccount(id: number, account: Partial<InsertSocialAccount>): Promise<SocialAccount | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async deleteSocialAccount(id: number): Promise<boolean> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return false;
+  }
+  
+  async getPosts(accountId: number): Promise<Post[]> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return [];
+  }
+  
+  async getPost(id: number): Promise<Post | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async createPost(post: InsertPost): Promise<Post> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    throw new Error("MemStorage is deprecated");
+  }
+  
+  async updatePost(id: number, post: Partial<InsertPost>): Promise<Post | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async deletePost(id: number): Promise<boolean> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return false;
+  }
+  
+  async getAnalytics(accountId: number): Promise<Analytics[]> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return [];
+  }
+  
+  async getAnalyticsForDate(accountId: number, date: Date): Promise<Analytics | undefined> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    return undefined;
+  }
+  
+  async createAnalytics(analytics: InsertAnalytics): Promise<Analytics> {
+    console.warn("Using MemStorage which is deprecated, use DatabaseStorage instead");
+    throw new Error("MemStorage is deprecated");
+  }
+}
+
+export const storage = new DatabaseStorage();

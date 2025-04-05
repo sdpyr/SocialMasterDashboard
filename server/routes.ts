@@ -1,11 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage, DatabaseStorage } from "./storage";
 import { insertSocialAccountSchema, insertPostSchema, insertAnalyticsSchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize database with sample data if needed
+  if (storage instanceof DatabaseStorage) {
+    try {
+      await storage.seedDemoData();
+    } catch (error) {
+      console.error("Failed to seed demo data:", error);
+    }
+  }
   // User routes
   app.get("/api/users/current", async (req, res) => {
     // In a real app we would get the user from a session
