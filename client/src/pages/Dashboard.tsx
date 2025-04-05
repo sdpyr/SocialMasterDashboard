@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import TabNavigation from '@/components/layout/TabNavigation';
-import { SortOption } from '@/lib/types';
 import { Link } from 'wouter';
+import TabNavigation from '@/components/layout/TabNavigation';
 
 export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,61 +84,71 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6">
+    <div>
       <TabNavigation />
+      <div className="page-header">
+        <h1 className="page-title">Dashboard</h1>
+        <p className="page-description">Sosyal medya hesaplarınızın genel durumuna bakın</p>
+      </div>
       
       <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="flat-card">
+        <div className="stat-card">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-slate-500 text-sm font-medium">Toplam Takipçi</h3>
+            <h3 className="stat-title">Toplam Takipçi</h3>
             <div className="p-1.5 rounded-full bg-blue-50 text-blue-500">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
               </svg>
             </div>
           </div>
-          <div className="flex items-baseline space-x-1">
-            <h2 className="text-2xl font-bold text-slate-800">{analytics.followers.toLocaleString()}</h2>
-            <span className="text-xs text-green-500 font-medium">+2.5%</span>
+          <div className="stat-value">{analytics.followers.toLocaleString()}</div>
+          <div className="stat-change stat-change-positive">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+            </svg>
+            <span>+2.5% haftalık artış</span>
           </div>
-          <p className="text-slate-500 text-xs mt-1">Bu hafta 320 yeni takipçi</p>
         </div>
         
-        <div className="flat-card">
+        <div className="stat-card">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-slate-500 text-sm font-medium">Etkileşim Oranı</h3>
+            <h3 className="stat-title">Etkileşim Oranı</h3>
             <div className="p-1.5 rounded-full bg-green-50 text-green-500">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
               </svg>
             </div>
           </div>
-          <div className="flex items-baseline space-x-1">
-            <h2 className="text-2xl font-bold text-slate-800">{analytics.engagement}%</h2>
-            <span className="text-xs text-green-500 font-medium">+0.8%</span>
+          <div className="stat-value">{analytics.engagement}%</div>
+          <div className="stat-change stat-change-positive">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+            </svg>
+            <span>+0.8% artış</span>
           </div>
-          <p className="text-slate-500 text-xs mt-1">Normal değerden %1.5 daha yüksek</p>
         </div>
         
-        <div className="flat-card">
+        <div className="stat-card">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-slate-500 text-sm font-medium">Toplam Gönderi</h3>
+            <h3 className="stat-title">Toplam Gönderi</h3>
             <div className="p-1.5 rounded-full bg-indigo-50 text-indigo-500">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
               </svg>
             </div>
           </div>
-          <div className="flex items-baseline space-x-1">
-            <h2 className="text-2xl font-bold text-slate-800">{analytics.posts}</h2>
-            <span className="text-xs text-green-500 font-medium">+12</span>
+          <div className="stat-value">{analytics.posts}</div>
+          <div className="stat-change stat-change-positive">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+            </svg>
+            <span>12 yeni gönderi</span>
           </div>
-          <p className="text-slate-500 text-xs mt-1">Bu ay 12 yeni gönderi</p>
         </div>
         
-        <div className="flat-card">
+        <div className="stat-card">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-slate-500 text-sm font-medium">Profil Görüntülenmesi</h3>
+            <h3 className="stat-title">Profil Görüntülenmesi</h3>
             <div className="p-1.5 rounded-full bg-orange-50 text-orange-500">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -147,93 +156,126 @@ export default function Dashboard() {
               </svg>
             </div>
           </div>
-          <div className="flex items-baseline space-x-1">
-            <h2 className="text-2xl font-bold text-slate-800">{analytics.views.toLocaleString()}</h2>
-            <span className="text-xs text-red-500 font-medium">-1.2%</span>
+          <div className="stat-value">{analytics.views.toLocaleString()}</div>
+          <div className="stat-change stat-change-negative">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clipRule="evenodd" />
+            </svg>
+            <span>-1.2% haftalık düşüş</span>
           </div>
-          <p className="text-slate-500 text-xs mt-1">Geçen haftaya göre azalış</p>
         </div>
       </div>
       
       <div className="mt-8 grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-2 flat-card">
-          <div className="flat-header">
-            <h3 className="text-lg font-medium text-slate-800">Performans Özeti</h3>
+        <div className="md:col-span-2 card">
+          <div className="card-header">
+            <h3 className="text-lg font-medium text-slate-800">Performans Grafiği</h3>
+            <div className="flex gap-2">
+              <button className="btn btn-sm btn-ghost">Günlük</button>
+              <button className="btn btn-sm btn-primary">Haftalık</button>
+              <button className="btn btn-sm btn-ghost">Aylık</button>
+            </div>
           </div>
           
-          <div className="h-64 flex items-center justify-center">
-            <p className="text-slate-500">Buraya grafik gelecek...</p>
+          <div className="card-body">
+            <div className="h-64 flex items-center justify-center">
+              <p className="text-slate-500">Buraya grafik gelecek...</p>
+            </div>
           </div>
         </div>
         
-        <div className="flat-card">
-          <div className="flat-header flex justify-between items-center">
+        <div className="card">
+          <div className="card-header">
             <h3 className="text-lg font-medium text-slate-800">Yaklaşan Gönderiler</h3>
-            <button className="text-primary text-sm font-medium hover:underline">
+            <Link to="/schedule" className="text-primary text-sm font-medium hover:underline">
               Tümünü Gör
+            </Link>
+          </div>
+          
+          <div className="card-body p-0">
+            <div className="divide-y divide-slate-100">
+              {upcomingPosts.map(post => (
+                <div key={post.id} className="flex items-center space-x-3 p-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden">
+                    <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">
+                      {post.title}
+                    </p>
+                    <div className="flex items-center mt-1">
+                      {getPlatformIcon(post.platform)}
+                      <span className="text-xs text-slate-500 ml-1">
+                        {formatDate(post.scheduledFor)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <button className="btn btn-ghost btn-sm p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="card-footer">
+            <button className="btn btn-primary w-full">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              Yeni Gönderi Planla
             </button>
           </div>
-          
-          <div className="space-y-4 mt-4">
-            {upcomingPosts.map(post => (
-              <div key={post.id} className="flex items-center space-x-3">
-                <div className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden">
-                  <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-800 truncate">
-                    {post.title}
-                  </p>
-                  <div className="flex items-center mt-1">
-                    {getPlatformIcon(post.platform)}
-                    <span className="text-xs text-slate-500 ml-1">
-                      {formatDate(post.scheduledFor)}
-                    </span>
-                  </div>
-                </div>
-                
-                <button className="p-1 text-slate-400 hover:text-primary rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-          
-          <button className="w-full mt-6 flat-button flat-button-outline">
-            Yeni Gönderi Planla
-          </button>
         </div>
       </div>
       
       <div className="mt-8 grid gap-6 md:grid-cols-5">
-        <div className="md:col-span-3 flat-card">
-          <div className="flat-header flex justify-between items-center">
+        <div className="md:col-span-3 card">
+          <div className="card-header">
             <h3 className="text-lg font-medium text-slate-800">Son Gönderiler</h3>
             <div className="flex space-x-2">
-              <button className="flat-button flat-button-outline py-1 px-3">
+              <button className="btn btn-outline btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+                </svg>
                 Filtrele
               </button>
-              <button className="flat-button flat-button-outline py-1 px-3">
+              <button className="btn btn-outline btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+                </svg>
                 Sırala
               </button>
             </div>
           </div>
           
-          <div className="min-h-[200px] flex items-center justify-center">
-            <p className="text-slate-500">Buraya gönderiler gelecek...</p>
+          <div className="card-body">
+            <div className="min-h-[200px] flex items-center justify-center">
+              <p className="text-slate-500">Buraya gönderiler gelecek...</p>
+            </div>
           </div>
         </div>
         
-        <div className="md:col-span-2 flat-card">
-          <div className="flat-header">
+        <div className="md:col-span-2 card">
+          <div className="card-header">
             <h3 className="text-lg font-medium text-slate-800">Popüler Hashtagler</h3>
+            <div>
+              <select className="form-select text-sm py-1">
+                <option>Bu hafta</option>
+                <option>Bu ay</option>
+                <option>Son 3 ay</option>
+              </select>
+            </div>
           </div>
           
-          <div className="min-h-[200px] flex items-center justify-center">
-            <p className="text-slate-500">Buraya hashtag analizi gelecek...</p>
+          <div className="card-body">
+            <div className="min-h-[200px] flex items-center justify-center">
+              <p className="text-slate-500">Buraya hashtag analizi gelecek...</p>
+            </div>
           </div>
         </div>
       </div>
