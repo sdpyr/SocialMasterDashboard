@@ -13,6 +13,7 @@ import AccountsPage from "@/pages/AccountsPage";
 import PostsPage from "@/pages/PostsPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import AdminPanel from "@/pages/admin-panel-new";
 import NotFound from "@/pages/not-found";
 
 // Main Layout Component
@@ -68,6 +69,9 @@ function Router() {
         
         {/* Settings */}
         <Route path="/settings" component={SettingsPage} />
+        
+        {/* Admin Panel */}
+        <Route path="/admin" component={AdminPanel} />
         
         {/* Fallback to 404 */}
         <Route component={NotFound} />
