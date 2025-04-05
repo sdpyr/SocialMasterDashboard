@@ -1,555 +1,74 @@
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Key, PlusCircle, RefreshCw, Trash2, CreditCard } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import TabNavigation from '@/components/layout/TabNavigation';
+import type { SocialAccount, User } from '@shared/schema';
 
-interface SubscriptionPlan {
-  id: number;
-  name: string;
-  tier: "free" | "premium" | "ultimate";
-  price: number;
-  maxAccounts: number;
-  maxPosts: number;
-  description: string;
-  features: string[];
-  isActive: boolean;
-  createdAt: Date;
-}
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  fullName: string;
-  role: "admin" | "user";
-  subscriptionTier: "free" | "premium" | "ultimate";
-  createdAt: Date;
-}
-
-interface ApiKey {
-  id: number;
-  name: string;
-  maskedKey: string;
-  service: string;
-  isActive: boolean;
-}
-
-interface SocialApiKey {
-  id: number;
-  platform: string;
-  apiKeyMasked: string;
-  apiSecretMasked: string;
-  isActive: boolean;
-  createdAt: Date;
-}
+// OAuth Sosyal Medya Platformları
+const supportedPlatforms = [
+  { id: 'facebook', name: 'Facebook', color: 'bg-blue-600', textColor: 'text-white', logo: 'facebook.png' },
+  { id: 'twitter', name: 'Twitter (X)', color: 'bg-black', textColor: 'text-white', logo: 'twitter.png' },
+  { id: 'instagram', name: 'Instagram', color: 'bg-gradient-to-r from-pink-500 to-yellow-500', textColor: 'text-white', logo: 'instagram.png' },
+  { id: 'linkedin', name: 'LinkedIn', color: 'bg-blue-700', textColor: 'text-white', logo: 'linkedin.png' },
+  { id: 'youtube', name: 'YouTube', color: 'bg-red-600', textColor: 'text-white', logo: 'youtube.png' },
+  { id: 'tiktok', name: 'TikTok', color: 'bg-black', textColor: 'text-white', logo: 'tiktok.png' },
+  { id: 'pinterest', name: 'Pinterest', color: 'bg-red-700', textColor: 'text-white', logo: 'pinterest.png' },
+];
 
 export default function AdminPanel() {
-  const { toast } = useToast();
-  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [socialApiKeys, setSocialApiKeys] = useState<SocialApiKey[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
-  
-  // Kullanıcı dialog
-  const [openUserDialog, setOpenUserDialog] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [userFormData, setUserFormData] = useState({
-    username: "",
-    password: "",
-    email: "",
-    fullName: "",
-    role: "user" as const,
-    subscriptionTier: "free" as const,
+  const [activeTab, setActiveTab] = useState('users');
+  const [isAdmin, setIsAdmin] = useState(true); // Geliştirme aşamasında herkese admin yetkisi verelim
+  const queryClient = useQueryClient();
+
+  // Kullanıcıları getir
+  const { data: users, isLoading: usersLoading } = useQuery<User[]>({
+    queryKey: ['/api/users'],
+    select: (data) => data || [],
   });
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    tier: "free" as const,
-    price: 0,
-    maxAccounts: 1,
-    maxPosts: 1,
-    description: "",
-    features: "",
-    isActive: true,
+
+  // Sosyal hesapları getir
+  const { data: accounts, isLoading: accountsLoading } = useQuery<SocialAccount[]>({
+    queryKey: ['/api/accounts'],
+    select: (data) => data || [],
   });
-  
-  const [apiKeyFormData, setApiKeyFormData] = useState({
-    name: "",
-    key: "",
-    service: "gemini" as const,
-    isActive: true,
-  });
-  const [openApiKeyDialog, setOpenApiKeyDialog] = useState(false);
-  const [editingApiKey, setEditingApiKey] = useState<ApiKey | null>(null);
-  
-  // Sosyal Medya API dialog
-  const [openSocialApiKeyDialog, setOpenSocialApiKeyDialog] = useState(false);
-  const [editingSocialApiKey, setEditingSocialApiKey] = useState<SocialApiKey | null>(null);
-  const [socialApiKeyFormData, setSocialApiKeyFormData] = useState({
-    platform: "instagram" as const,
-    apiKey: "",
-    apiSecret: "",
-    isActive: true,
-  });
-  
-  // API anahtarı işlemleri
-  const handleApiKeyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setApiKeyFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-  
-  const handleApiKeySubmit = async () => {
-    try {
-      const apiKeyData = {
-        ...apiKeyFormData,
-      };
-      
-      let response;
-      
-      if (editingApiKey) {
-        // API anahtarını güncelle
-        response = await apiRequest(
-          "PATCH",
-          `/api/api-keys/${editingApiKey.id}`,
-          apiKeyData
-        );
-        toast({
-          title: "API Anahtarı Güncellendi",
-          description: "API anahtarı başarıyla güncellendi.",
-        });
-      } else {
-        // Yeni API anahtarı ekle
-        response = await apiRequest(
-          "POST", 
-          "/api/api-keys",
-          apiKeyData
-        );
-        toast({
-          title: "API Anahtarı Eklendi",
-          description: "Yeni API anahtarı başarıyla eklendi.",
-        });
-      }
-      
-      // API anahtarlarını yeniden yükle
-      fetchData();
-      setOpenApiKeyDialog(false);
-      
-    } catch (error) {
-      console.error("API anahtarı işlemi sırasında hata:", error);
-      toast({
-        title: "İşlem Hatası",
-        description: "API anahtarı işlemi sırasında bir hata oluştu.",
-        variant: "destructive",
-      });
-    }
-  };
-  
-  const handleDeleteApiKey = async (keyId: number) => {
-    if (window.confirm("Bu API anahtarını silmek istediğinizden emin misiniz?")) {
-      try {
-        await apiRequest("DELETE", `/api/api-keys/${keyId}`);
-        toast({
-          title: "API Anahtarı Silindi",
-          description: "API anahtarı başarıyla silindi.",
-        });
-        // API anahtarlarını yeniden yükle
-        fetchData();
-      } catch (error) {
-        console.error("API anahtarı silme sırasında hata:", error);
-        toast({
-          title: "Silme Hatası",
-          description: "API anahtarı silinirken bir hata oluştu.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-  
-  const handleAddApiKey = () => {
-    setEditingApiKey(null);
-    setApiKeyFormData({
-      name: "",
-      key: "",
-      service: "gemini",
-      isActive: true,
-    });
-    setOpenApiKeyDialog(true);
-  };
-  
-  const handleEditApiKey = (apiKey: ApiKey) => {
-    setEditingApiKey(apiKey);
-    setApiKeyFormData({
-      name: apiKey.name,
-      key: apiKey.maskedKey || "••••••••••••••••••", // Güvenlik için maskeli gösterme
-      service: apiKey.service as any,
-      isActive: apiKey.isActive,
-    });
-    setOpenApiKeyDialog(true);
-  };
 
-  // Mevcut kullanıcı admin mi kontrol et
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      try {
-        const response = await apiRequest("GET", "/api/user");
-        const userData = await response.json();
-        
-        // Geliştirme için tüm kullanıcılara admin yetkisi verelim
-        setIsAdmin(true);
-        
-        // Normalde bu şekilde kontrol edilmeli:
-        // setIsAdmin(userData.role === "admin");
-        // if (userData.role !== "admin") {
-        //   toast({
-        //     title: "Erişim Reddedildi",
-        //     description: "Bu sayfaya erişmek için admin yetkileri gereklidir.",
-        //     variant: "destructive",
-        //   });
-        // } else {
-        //   fetchData();
-        // }
-        
-        // Şimdilik herkese veri yükleme izni
-        fetchData();
-      } catch (error) {
-        console.error("Admin kontrolü sırasında hata:", error);
-        // Hata durumunda bile erişime izin verelim
-        setIsAdmin(true);
-        fetchData();
-      }
-    };
-
-    checkAdminStatus();
-  }, [toast]);
-
-  // Sosyal Medya API işlemleri
-  const handleSocialApiKeyInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
-    setSocialApiKeyFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-  
-  const handleAddSocialApiKey = () => {
-    setEditingSocialApiKey(null);
-    setSocialApiKeyFormData({
-      platform: "instagram",
-      apiKey: "",
-      apiSecret: "",
-      isActive: true,
-    });
-    setOpenSocialApiKeyDialog(true);
-  };
-  
-  const handleEditSocialApiKey = (apiKey: SocialApiKey) => {
-    setEditingSocialApiKey(apiKey);
-    setSocialApiKeyFormData({
-      platform: apiKey.platform,
-      apiKey: apiKey.apiKeyMasked || "••••••••••••••••••",
-      apiSecret: apiKey.apiSecretMasked || "••••••••••••••••••",
-      isActive: apiKey.isActive,
-    });
-    setOpenSocialApiKeyDialog(true);
-  };
-  
-  const handleSocialApiKeySubmit = async () => {
-    try {
-      const apiKeyData = {
-        ...socialApiKeyFormData,
-      };
-      
-      let response;
-      
-      if (editingSocialApiKey) {
-        // API anahtarını güncelle
-        response = await apiRequest(
-          "PATCH",
-          `/api/social-api-keys/${editingSocialApiKey.id}`,
-          apiKeyData
-        );
-        toast({
-          title: "Sosyal Medya API Anahtarı Güncellendi",
-          description: "API anahtarı başarıyla güncellendi.",
-        });
-      } else {
-        // Yeni API anahtarı ekle
-        response = await apiRequest(
-          "POST", 
-          "/api/social-api-keys",
-          apiKeyData
-        );
-        toast({
-          title: "Sosyal Medya API Anahtarı Eklendi",
-          description: "Yeni API anahtarı başarıyla eklendi.",
-        });
-      }
-      
-      // API anahtarlarını yeniden yükle
-      fetchData();
-      setOpenSocialApiKeyDialog(false);
-      
-    } catch (error) {
-      console.error("Sosyal Medya API anahtarı işlemi sırasında hata:", error);
-      toast({
-        title: "İşlem Hatası",
-        description: "API anahtarı işlemi sırasında bir hata oluştu.",
-        variant: "destructive",
-      });
-    }
-  };
-  
-  const handleDeleteSocialApiKey = async (keyId: number) => {
-    if (window.confirm("Bu sosyal medya API anahtarını silmek istediğinizden emin misiniz?")) {
-      try {
-        await apiRequest("DELETE", `/api/social-api-keys/${keyId}`);
-        toast({
-          title: "API Anahtarı Silindi",
-          description: "Sosyal medya API anahtarı başarıyla silindi.",
-        });
-        // API anahtarlarını yeniden yükle
-        fetchData();
-      } catch (error) {
-        console.error("API anahtarı silme sırasında hata:", error);
-        toast({
-          title: "Silme Hatası",
-          description: "API anahtarı silinirken bir hata oluştu.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  // Verileri getir
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // Abonelik planlarını getir
-      const plansResponse = await apiRequest("GET", "/api/subscription-plans");
-      const plansData = await plansResponse.json();
-      setSubscriptionPlans(plansData);
-
-      // Kullanıcıları getir
-      const usersResponse = await apiRequest("GET", "/api/users");
-      const usersData = await usersResponse.json();
-      setUsers(usersData);
-      
-      // API anahtarlarını getir
-      const apiKeysResponse = await apiRequest("GET", "/api/api-keys");
-      const apiKeysData = await apiKeysResponse.json();
-      setApiKeys(apiKeysData);
-      
-      // Sosyal Medya API anahtarlarını getir
-      try {
-        const socialApiKeysResponse = await apiRequest("GET", "/api/social-api-keys");
-        const socialApiKeysData = await socialApiKeysResponse.json();
-        setSocialApiKeys(socialApiKeysData);
-      } catch (error) {
-        console.error("Sosyal medya API anahtarları yüklenemedi:", error);
-        // Geliştirme aşamasında örnek veri kullanabiliriz
-        const dummyData: SocialApiKey[] = [
-          {
-            id: 1,
-            platform: "instagram",
-            apiKeyMasked: "inst•••••••••••••••", 
-            apiSecretMasked: "inst•••••••••••••••",
-            isActive: true,
-            createdAt: new Date(),
-          },
-          {
-            id: 2,
-            platform: "facebook",
-            apiKeyMasked: "face•••••••••••••••", 
-            apiSecretMasked: "face•••••••••••••••",
-            isActive: true,
-            createdAt: new Date(),
-          },
-        ];
-        setSocialApiKeys(dummyData);
-      }
-    } catch (error) {
-      console.error("Veri getirme sırasında hata:", error);
-      toast({
-        title: "Veri Yükleme Hatası",
-        description: "Veriler yüklenirken bir hata oluştu.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Dialog içindeki form verisini güncelle
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = (e.target as HTMLInputElement).checked;
+  const handleConnectPlatform = (platformId: string) => {
+    // Gerçek bir uygulamada, bu burada OAuth akışını başlatır
+    // Şu an için basit bir simülasyon yapıyoruz
+    window.alert(`${platformId} bağlantısı başlatılıyor... Bu işlem yeni pencere açacaktır.`);
     
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  // Yeni plan ekle veya güncelle
-  const handleSubmit = async () => {
-    try {
-      const planData = {
-        ...formData,
-        price: Number(formData.price),
-        maxAccounts: Number(formData.maxAccounts),
-        maxPosts: Number(formData.maxPosts),
-        features: formData.features.split(",").map(item => item.trim()),
-      };
-      
-      let response;
-      
-      if (editingPlan) {
-        // Planı güncelle
-        response = await apiRequest(
-          "PATCH",
-          `/api/subscription-plans/${editingPlan.id}`,
-          planData
-        );
-        toast({
-          title: "Plan Güncellendi",
-          description: "Abonelik planı başarıyla güncellendi.",
-        });
-      } else {
-        // Yeni plan ekle
-        response = await apiRequest(
-          "POST", 
-          "/api/subscription-plans",
-          planData
-        );
-        toast({
-          title: "Plan Eklendi",
-          description: "Yeni abonelik planı başarıyla eklendi.",
-        });
-      }
-      
-      // Planları yeniden yükle
-      fetchData();
-      setOpenDialog(false);
-      
-    } catch (error) {
-      console.error("Plan kaydı sırasında hata:", error);
-      toast({
-        title: "İşlem Hatası",
-        description: "Abonelik planı işlemi sırasında bir hata oluştu.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Planı silme işlemi
-  const handleDeletePlan = async (planId: number) => {
-    if (window.confirm("Bu abonelik planını silmek istediğinizden emin misiniz?")) {
-      try {
-        await apiRequest("DELETE", `/api/subscription-plans/${planId}`);
-        toast({
-          title: "Plan Silindi",
-          description: "Abonelik planı başarıyla silindi.",
-        });
-        // Planları yeniden yükle
-        fetchData();
-      } catch (error) {
-        console.error("Plan silme sırasında hata:", error);
-        toast({
-          title: "Silme Hatası",
-          description: "Abonelik planı silinirken bir hata oluştu.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  // Plan düzenleme işlemi
-  const handleEditPlan = (plan: SubscriptionPlan) => {
-    setEditingPlan(plan);
-    setFormData({
-      name: plan.name,
-      tier: plan.tier,
-      price: plan.price,
-      maxAccounts: plan.maxAccounts,
-      maxPosts: plan.maxPosts,
-      description: plan.description,
-      features: plan.features.join(", "),
-      isActive: plan.isActive,
-    });
-    setOpenDialog(true);
-  };
-
-  // Yeni plan ekleme işlemi
-  const handleAddPlan = () => {
-    setEditingPlan(null);
-    setFormData({
-      name: "",
-      tier: "free",
-      price: 0,
-      maxAccounts: 1,
-      maxPosts: 1,
-      description: "",
-      features: "",
-      isActive: true,
-    });
-    setOpenDialog(true);
-  };
-  
-  // Kullanıcı işlemleri
-  const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = (e.target as HTMLInputElement).checked;
+    // Gerçek OAuth akışı şöyle olacaktır:
+    // 1. Platforma göre bir yönlendirme URL'si oluştur
+    // 2. Kullanıcıyı bu URL'ye yönlendir (yeni pencere veya sekme)
+    // 3. Kullanıcı platforma giriş yaptıktan sonra, callback URL'yi işle
+    // 4. Token'ları alıp kaydet
     
-    setUserFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    // Örnek:
+    // window.open(`https://oauth.${platformId}.com/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&response_type=code`, '_blank');
   };
-  
-  const handleAddUser = () => {
-    setEditingUser(null);
-    setUserFormData({
-      username: "",
-      password: "",
-      email: "",
-      fullName: "",
-      role: "user",
-      subscriptionTier: "free",
-    });
-    setOpenUserDialog(true);
+
+  const formatDate = (dateString: string | Date | null) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('tr-TR');
   };
+
+  if (!isAdmin) {
+    return (
+      <div>
+        <TabNavigation />
+        <div className="page-header mb-8">
+          <h1 className="page-title">Yönetim Paneli</h1>
+          <p className="page-description">Erişim reddedildi - Bu sayfaya erişmek için yönetici yetkileri gereklidir</p>
+        </div>
+        <div className="card p-8 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m0 0v2m0-2h2m-2 0H9m3-10v4m5 4H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v9a2 2 0 01-2 2z" />
+          </svg>
+          <h2 className="mt-4 text-xl font-medium text-slate-800">Erişim Reddedildi</h2>
+          <p className="mt-2 text-slate-500">Bu sayfaya erişmek için yönetici yetkileri gereklidir.</p>
+        </div>
+      </div>
+    );
+  }
   
   const handleEditUser = (user: User) => {
     setEditingUser(user);
