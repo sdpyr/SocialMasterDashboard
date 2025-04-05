@@ -4,6 +4,8 @@ import {
   posts, type Post, type InsertPost,
   analytics, type Analytics, type InsertAnalytics
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
 
 // Interface for all storage operations
 export interface IStorage {
@@ -32,32 +34,158 @@ export interface IStorage {
   createAnalytics(analytics: InsertAnalytics): Promise<Analytics>;
 }
 
-// In-memory implementation
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private socialAccounts: Map<number, SocialAccount>;
-  private posts: Map<number, Post>;
-  private analytics: Map<number, Analytics>;
-  private currentUserId: number;
-  private currentAccountId: number;
-  private currentPostId: number;
-  private currentAnalyticsId: number;
+// Database implementation
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+  
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  // Social Account operations
+  async getSocialAccounts(userId: number): Promise<SocialAccount[]> {
+    return await db.select().from(socialAccounts).where(eq(socialAccounts.userId, userId));
+  }
+  
+  async getSocialAccount(id: number): Promise<SocialAccount | undefined> {
+    const [account] = await db.select().from(socialAccounts).where(eq(socialAccounts.id, id));
+    return account || undefined;
+  }
+  
+  async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
+    const [newAccount] = await db.insert(socialAccounts).values({
+      ...account,
+      profilePicture: account.profilePicture || `https://ui-avatars.com/api/?name=${account.platform}&background=0D8ABC&color=fff`,
+      followerCount: 0,
+      followingCount: 0,
+      lastSync: new Date()
+    }).returning();
+    return newAccount;
+  }
+  
+  async updateSocialAccount(id: number, accountUpdate: Partial<InsertSocialAccount>): Promise<SocialAccount | undefined> {
+    const [updatedAccount] = await db.update(socialAccounts)
+      .set(accountUpdate)
+      .where(eq(socialAccounts.id, id))
+      .returning();
+    return updatedAccount || undefined;
+  }
+  
+  async deleteSocialAccount(id: number): Promise<boolean> {
+    const result = await db.delete(socialAccounts).where(eq(socialAccounts.id, id));
+    return !!result;
+  }
 
-  constructor() {
-    this.users = new Map();
-    this.socialAccounts = new Map();
-    this.posts = new Map();
-    this.analytics = new Map();
-    this.currentUserId = 1;
-    this.currentAccountId = 1;
-    this.currentPostId = 1;
-    this.currentAnalyticsId = 1;
+  // Post operations
+  async getPosts(accountId: number): Promise<Post[]> {
+    return await db.select().from(posts).where(eq(posts.accountId, accountId));
+  }
+  
+  async getPost(id: number): Promise<Post | undefined> {
+    const [post] = await db.select().from(posts).where(eq(posts.id, id));
+    return post || undefined;
+  }
+  
+  async createPost(post: InsertPost): Promise<Post> {
+    const publishedAt = post.status === 'published' ? new Date() : null;
+    const [newPost] = await db.insert(posts).values({
+      ...post,
+      publishedAt,
+      engagement: {}
+    }).returning();
+    return newPost;
+  }
+  
+  async updatePost(id: number, postUpdate: Partial<InsertPost>): Promise<Post | undefined> {
+    // If status changed to published, set publishedAt
+    let updateData = { ...postUpdate };
+    if (postUpdate.status === 'published') {
+      const [existingPost] = await db.select().from(posts).where(eq(posts.id, id));
+      if (existingPost && existingPost.status !== 'published') {
+        updateData = { ...updateData, publishedAt: new Date() };
+      }
+    }
     
-    // Add sample user for demo
-    const demoUser: User = {
-      id: this.currentUserId,
-      username: "demo",
-      password: "password", // In real app, this would be hashed
+    const [updatedPost] = await db.update(posts)
+      .set(updateData)
+      .where(eq(posts.id, id))
+      .returning();
+    return updatedPost || undefined;
+  }
+  
+  async deletePost(id: number): Promise<boolean> {
+    const result = await db.delete(posts).where(eq(posts.id, id));
+    return !!result;
+  }
+  
+  // Analytics operations
+  async getAnalytics(accountId: number): Promise<Analytics[]> {
+    return await db.select()
+      .from(analytics)
+      .where(eq(analytics.accountId, accountId))
+      .orderBy(desc(analytics.date));
+  }
+  
+  async getAnalyticsForDate(accountId: number, date: Date): Promise<Analytics | undefined> {
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0); // Set to start of day
+    const nextDay = new Date(targetDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    
+    const [result] = await db.select()
+      .from(analytics)
+      .where(
+        and(
+          eq(analytics.accountId, accountId),
+          and(
+            date => date >= targetDate,
+            date => date < nextDay
+          )
+        )
+      );
+    return result || undefined;
+  }
+  
+  async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
+    const [newAnalytics] = await db.insert(analytics)
+      .values(analyticsData)
+      .returning();
+    return newAnalytics;
+  }
+  
+  // Seed demo data function
+  async seedDemoData() {
+    try {
+      console.log("Checking if data exists...");
+      const userCount = await db.select().from(users);
+      
+      if (userCount.length > 0) {
+        console.log("Demo data already exists");
+        return;
+      }
+      
+      console.log("Seeding demo data...");
+      
+      // Create demo user
+      const [demoUser] = await db.insert(users).values({
+        username: "demo",
+        password: "$2b$10$GqK5OjrC0Eby1NP0z5z/6uLVLKs3ezjEUrWrCsR66KSJpTpm6UZ5e", // password: demo
+        fullName: "Demo Kullanıcı",
+        email: "demo@example.com",
+        avatar: "https://ui-avatars.com/api/?name=Demo+User&background=0D8ABC&color=fff"
+      }).returning();
+      
+      // Create sample social accounts
       fullName: "Demo User",
       email: "demo@example.com",
       avatar: null,

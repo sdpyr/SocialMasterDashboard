@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb, timestamp, relations } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -12,6 +12,10 @@ export const users = pgTable("users", {
   avatar: text("avatar"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  socialAccounts: many(socialAccounts),
+}));
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -36,6 +40,15 @@ export const socialAccounts = pgTable("social_accounts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const socialAccountsRelations = relations(socialAccounts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [socialAccounts.userId],
+    references: [users.id],
+  }),
+  posts: many(posts),
+  analytics: many(analytics),
+}));
+
 export const insertSocialAccountSchema = createInsertSchema(socialAccounts).omit({
   id: true,
   createdAt: true,
@@ -59,6 +72,13 @@ export const posts = pgTable("posts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const postsRelations = relations(posts, ({ one }) => ({
+  account: one(socialAccounts, {
+    fields: [posts.accountId],
+    references: [socialAccounts.id],
+  }),
+}));
+
 export const insertPostSchema = createInsertSchema(posts).omit({
   id: true,
   publishedAt: true,
@@ -81,6 +101,13 @@ export const analytics = pgTable("analytics", {
   data: jsonb("data"), // platform specific analytics data
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const analyticsRelations = relations(analytics, ({ one }) => ({
+  account: one(socialAccounts, {
+    fields: [analytics.accountId],
+    references: [socialAccounts.id],
+  }),
+}));
 
 export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
   id: true,
