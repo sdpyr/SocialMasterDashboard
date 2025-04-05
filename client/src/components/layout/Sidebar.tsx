@@ -17,7 +17,7 @@ export default function Sidebar() {
   const navigationItems: NavigationItem[] = [
     {
       icon: "star",
-      label: "Sık Kullanılanlar",
+      label: "Genel Bakış",
       items: [
         {
           icon: "desktop",
