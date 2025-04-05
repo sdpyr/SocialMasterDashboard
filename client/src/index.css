@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+:root {
+  --font-segoe: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-segoe);
+}
+
+.folder-icon {
+  color: #ffc107;
+}
+
+.file-icon {
+  color: #0078d7;
+}
+
+.windows-frame {
+  @apply flex flex-col min-h-screen;
+}
+
+.windows-titlebar {
+  @apply bg-primary text-white px-4 py-2 flex items-center justify-between;
+}
+
+.windows-button {
+  @apply hover:bg-blue-600 rounded p-1;
+}
+
+.windows-close-button {
+  @apply hover:bg-red-500 rounded p-1;
+}
+
+.windows-addressbar {
+  @apply bg-white border-b border-neutral-300 px-2 py-1 flex items-center;
+}
+
+.windows-tab {
+  @apply px-4 py-2 text-sm hover:bg-neutral-200 flex items-center;
+}
+
+.windows-sidebar {
+  @apply w-56 bg-neutral-100 border-r border-neutral-300 p-2;
+}
+
+.sidebar-item {
+  @apply flex items-center text-sm p-1 rounded hover:bg-neutral-200 text-neutral-700;
+}
+
+.sidebar-header {
+  @apply font-medium text-sm mb-1;
+}
+
+.sidebar-section {
+  @apply mt-4;
+}
+
+.windows-statusbar {
+  @apply bg-neutral-100 border-t border-neutral-300 px-4 py-1 flex justify-between text-xs text-neutral-600;
+}
+
+.folder-item {
+  @apply text-center;
+}
+
+.folder-icon {
+  @apply w-20 h-20 mx-auto mb-1 flex justify-center items-center;
+}
+
+.folder-name {
+  @apply text-sm text-center truncate;
+}
+
+.folder-grid {
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6;
+}
+
+.folder-section {
+  @apply mt-8;
+}

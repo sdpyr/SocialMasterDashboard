@@ -1,0 +1,211 @@
+import React from 'react';
+import { Link, useLocation } from 'wouter';
+import { NavigationItem } from '@/lib/types';
+import { 
+  TwitterIcon, 
+  FacebookIcon, 
+  InstagramIcon, 
+  LinkedInIcon, 
+  YoutubeIcon,
+  AnalyticsIcon,
+  SettingsIcon
+} from '@/lib/icons';
+
+export default function Sidebar() {
+  const [location] = useLocation();
+
+  const navigationItems: NavigationItem[] = [
+    {
+      icon: "star",
+      label: "Sık Kullanılanlar",
+      items: [
+        {
+          icon: "desktop",
+          label: "Dashboard",
+          path: "/",
+          isActive: location === "/"
+        }
+      ]
+    },
+    {
+      icon: "accounts",
+      label: "Sosyal Hesaplar",
+      items: [
+        {
+          icon: "twitter",
+          label: "Twitter",
+          path: "/accounts/twitter",
+          isActive: location === "/accounts/twitter"
+        },
+        {
+          icon: "facebook",
+          label: "Facebook",
+          path: "/accounts/facebook",
+          isActive: location === "/accounts/facebook"
+        },
+        {
+          icon: "instagram",
+          label: "Instagram",
+          path: "/accounts/instagram",
+          isActive: location === "/accounts/instagram"
+        },
+        {
+          icon: "linkedin",
+          label: "LinkedIn",
+          path: "/accounts/linkedin",
+          isActive: location === "/accounts/linkedin"
+        },
+        {
+          icon: "youtube",
+          label: "YouTube",
+          path: "/accounts/youtube",
+          isActive: location === "/accounts/youtube"
+        }
+      ]
+    },
+    {
+      icon: "posts",
+      label: "İçerik Yönetimi",
+      items: [
+        {
+          icon: "posts",
+          label: "Gönderiler",
+          path: "/posts",
+          isActive: location === "/posts"
+        },
+        {
+          icon: "schedule",
+          label: "Zamanlama",
+          path: "/schedule",
+          isActive: location === "/schedule"
+        },
+        {
+          icon: "drafts",
+          label: "Taslaklar",
+          path: "/drafts",
+          isActive: location === "/drafts"
+        }
+      ]
+    },
+    {
+      icon: "analytics",
+      label: "Analitik",
+      path: "/analytics",
+      isActive: location === "/analytics"
+    },
+    {
+      icon: "settings",
+      label: "Ayarlar",
+      path: "/settings",
+      isActive: location === "/settings"
+    }
+  ];
+
+  const renderIcon = (icon: string) => {
+    switch (icon) {
+      case "star":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500 mr-2">
+            <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
+          </svg>
+        );
+      case "desktop":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-neutral-400 mr-2">
+            <path fillRule="evenodd" d="M2.25 5.25a3 3 0 013-3h13.5a3 3 0 013 3V15a3 3 0 01-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 01-.53 1.28h-9a.75.75 0 01-.53-1.28l.621-.622a2.25 2.25 0 00.659-1.59V18h-3a3 3 0 01-3-3V5.25zm1.5 0v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5z" clipRule="evenodd" />
+          </svg>
+        );
+      case "accounts":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-neutral-400 mr-2">
+            <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+          </svg>
+        );
+      case "twitter":
+        return <TwitterIcon className="w-4 h-4 text-blue-400 mr-2" />;
+      case "facebook":
+        return <FacebookIcon className="w-4 h-4 text-blue-600 mr-2" />;
+      case "instagram":
+        return <InstagramIcon className="w-4 h-4 text-pink-600 mr-2" />;
+      case "linkedin":
+        return <LinkedInIcon className="w-4 h-4 text-blue-700 mr-2" />;
+      case "youtube":
+        return <YoutubeIcon className="w-4 h-4 text-red-600 mr-2" />;
+      case "posts":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-neutral-400 mr-2">
+            <path fillRule="evenodd" d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 003 3h15a3 3 0 01-3-3V4.875C17.25 3.839 16.41 3 15.375 3H4.125zM12 9.75a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5H12zm-.75-2.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H12a.75.75 0 01-.75-.75zM6 12.75a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5H6zm-.75 3.75a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5H6a.75.75 0 01-.75-.75zM6 6.75a.75.75 0 00-.75.75v.75c0 .414.336.75.75.75h3a.75.75 0 00.75-.75v-.75a.75.75 0 00-.75-.75H6z" clipRule="evenodd" />
+            <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 01-3 0V6.75z" />
+          </svg>
+        );
+      case "schedule":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-neutral-400 mr-2">
+            <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
+          </svg>
+        );
+      case "drafts":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-neutral-400 mr-2">
+            <path fillRule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 013.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 013.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875zM9.75 17.25a.75.75 0 00-1.5 0V18a.75.75 0 001.5 0v-.75zm2.25-3a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0v-3a.75.75 0 01.75-.75zm3.75-1.5a.75.75 0 00-1.5 0V18a.75.75 0 001.5 0v-5.25z" clipRule="evenodd" />
+          </svg>
+        );
+      case "analytics":
+        return <AnalyticsIcon className="w-4 h-4 text-neutral-400 mr-2" />;
+      case "settings":
+        return <SettingsIcon className="w-4 h-4 text-neutral-400 mr-2" />;
+      default:
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-neutral-400 mr-2">
+            <path fillRule="evenodd" d="M5.478 5.559A1.5 1.5 0 016.912 4.5H9A.75.75 0 009 3H6.912a3 3 0 00-2.868 2.118l-2.411 7.838a3 3 0 00-.133.882V18a3 3 0 003 3h15a3 3 0 003-3v-4.162c0-.299-.045-.596-.133-.882l-2.412-7.838A3 3 0 0017.088 3H15a.75.75 0 000 1.5h2.088a1.5 1.5 0 011.434 1.059l2.213 7.191H17.89a3 3 0 00-2.684 1.658l-.256.513a1.5 1.5 0 01-1.342.829h-3.218a1.5 1.5 0 01-1.342-.83l-.256-.512a3 3 0 00-2.684-1.658H3.265l2.213-7.191z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v6.44l1.72-1.72a.75.75 0 111.06 1.06l-3 3a.75.75 0 01-1.06 0l-3-3a.75.75 0 011.06-1.06l1.72 1.72V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
+          </svg>
+        );
+    }
+  };
+
+  const renderNavItem = (item: NavigationItem) => {
+    if (item.path) {
+      return (
+        <Link to={item.path}>
+          <div className={`sidebar-item ${item.isActive ? 'bg-neutral-200' : ''}`}>
+            {renderIcon(item.icon)}
+            <span>{item.label}</span>
+          </div>
+        </Link>
+      );
+    }
+    
+    return (
+      <div className="sidebar-item">
+        {renderIcon(item.icon)}
+        <span>{item.label}</span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="windows-sidebar">
+      <div className="space-y-1">
+        {navigationItems.map((item, index) => (
+          <div key={index} className="sidebar-section">
+            {renderNavItem(item)}
+            
+            {item.items && (
+              <div className="pl-4 space-y-1 mt-1">
+                {item.items.map((subItem, subIndex) => (
+                  <Link key={subIndex} to={subItem.path || "#"}>
+                    <div className={`sidebar-item ${subItem.isActive ? 'bg-neutral-200' : ''}`}>
+                      {renderIcon(subItem.icon)}
+                      <span>{subItem.label}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
