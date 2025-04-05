@@ -13,19 +13,21 @@
 }
 
 :root {
-  --font-segoe: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-system: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
-  font-family: var(--font-segoe);
+  font-family: var(--font-system);
+  @apply bg-slate-50;
 }
 
+/* Flat 2.0 Design System */
 .folder-icon {
-  color: #ffc107;
+  color: #3b82f6;
 }
 
 .file-icon {
-  color: #0078d7;
+  color: #60a5fa;
 }
 
 .windows-frame {
@@ -33,61 +35,94 @@ body {
 }
 
 .windows-titlebar {
-  @apply bg-primary text-white px-4 py-2 flex items-center justify-between;
+  @apply bg-white text-slate-800 px-4 py-3 flex items-center justify-between shadow-sm;
 }
 
 .windows-button {
-  @apply hover:bg-blue-600 rounded p-1;
+  @apply hover:bg-slate-100 p-1.5 rounded-sm transition-colors;
 }
 
 .windows-close-button {
-  @apply hover:bg-red-500 rounded p-1;
+  @apply hover:bg-red-100 hover:text-red-500 p-1.5 rounded-sm transition-colors;
 }
 
 .windows-addressbar {
-  @apply bg-white border-b border-neutral-300 px-2 py-1 flex items-center;
+  @apply bg-white shadow-sm px-3 py-2 flex items-center;
 }
 
 .windows-tab {
-  @apply px-4 py-2 text-sm hover:bg-neutral-200 flex items-center;
+  @apply px-4 py-2.5 text-sm hover:bg-slate-100 flex items-center border-b-2 border-transparent hover:border-slate-300 transition-colors;
+}
+
+.windows-tab.active {
+  @apply border-primary text-primary;
 }
 
 .windows-sidebar {
-  @apply w-56 bg-neutral-100 border-r border-neutral-300 p-2;
+  @apply w-60 bg-white shadow-sm p-3;
 }
 
 .sidebar-item {
-  @apply flex items-center text-sm p-1 rounded hover:bg-neutral-200 text-neutral-700;
+  @apply flex items-center text-sm p-2 rounded-sm hover:bg-slate-100 text-slate-700 transition-colors;
+}
+
+.sidebar-item.active {
+  @apply bg-primary/10 text-primary;
 }
 
 .sidebar-header {
-  @apply font-medium text-sm mb-1;
+  @apply font-medium text-xs uppercase tracking-wider text-slate-500 mb-2 px-2;
 }
 
 .sidebar-section {
-  @apply mt-4;
+  @apply mt-6 first:mt-2;
 }
 
 .windows-statusbar {
-  @apply bg-neutral-100 border-t border-neutral-300 px-4 py-1 flex justify-between text-xs text-neutral-600;
+  @apply bg-white shadow-sm px-4 py-2 flex justify-between text-xs text-slate-500;
 }
 
 .folder-item {
-  @apply text-center;
+  @apply text-center p-2 rounded-sm hover:bg-slate-100 transition-colors cursor-pointer;
 }
 
 .folder-icon {
-  @apply w-20 h-20 mx-auto mb-1 flex justify-center items-center;
+  @apply w-16 h-16 mx-auto mb-2 flex justify-center items-center text-primary;
 }
 
 .folder-name {
-  @apply text-sm text-center truncate;
+  @apply text-sm text-center truncate font-medium text-slate-700;
 }
 
 .folder-grid {
-  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6;
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3;
 }
 
 .folder-section {
-  @apply mt-8;
+  @apply mt-6;
+}
+
+/* Card and UI Styles */
+.flat-card {
+  @apply bg-white rounded-sm shadow-sm p-4 border border-slate-200;
+}
+
+.flat-header {
+  @apply border-b border-slate-200 pb-3 mb-4;
+}
+
+.flat-input {
+  @apply border border-slate-300 rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm;
+}
+
+.flat-button {
+  @apply px-4 py-2 rounded-sm text-sm font-medium transition-colors;
+}
+
+.flat-button-primary {
+  @apply bg-primary text-white hover:bg-primary/90;
+}
+
+.flat-button-outline {
+  @apply border border-slate-300 text-slate-700 hover:bg-slate-100;
 }

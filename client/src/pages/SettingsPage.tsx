@@ -328,9 +328,14 @@ export default function SettingsPage() {
                   
                   <div className="space-y-2">
                     <Label htmlFor="font-size">Yazı Tipi Boyutu</Label>
-                    <select id="font-size" className="w-full p-2 border rounded-md">
+                    <select 
+                      id="font-size" 
+                      className="w-full p-2 border rounded-md"
+                      value="medium"
+                      onChange={(e) => console.log(e.target.value)}
+                    >
                       <option value="small">Küçük</option>
-                      <option value="medium" selected>Orta</option>
+                      <option value="medium">Orta</option>
                       <option value="large">Büyük</option>
                     </select>
                   </div>

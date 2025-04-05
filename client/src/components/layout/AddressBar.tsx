@@ -1,5 +1,5 @@
 import React from 'react';
-import { BreadcrumbItem } from '@/lib/types';
+import { BreadcrumbItem } from '../../lib/types';
 
 interface AddressBarProps {
   breadcrumbs: BreadcrumbItem[];
@@ -57,7 +57,7 @@ export default function AddressBar({ breadcrumbs, searchQuery, onSearchChange }:
 
       <div className="flex-1 flex items-center text-sm">
         {breadcrumbs.map((item, index) => (
-          <React.Fragment key={index}>
+          <div key={index} className="flex items-center">
             {index > 0 && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@ export default function AddressBar({ breadcrumbs, searchQuery, onSearchChange }:
             <span className={item.isActive ? "font-medium" : "text-neutral-500"}>
               {item.label}
             </span>
-          </React.Fragment>
+          </div>
         ))}
       </div>
 
