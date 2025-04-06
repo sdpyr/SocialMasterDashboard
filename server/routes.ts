@@ -1,7 +1,15 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage, DatabaseStorage } from "./storage";
-import { insertSocialAccountSchema, insertPostSchema, insertAnalyticsSchema } from "@shared/schema";
+import { 
+  insertSocialAccountSchema, 
+  insertPostSchema, 
+  insertAnalyticsSchema,
+  insertPageSchema,
+  insertPageSectionSchema,
+  insertMenuItemSchema,
+  insertFaqItemSchema 
+} from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { db } from "./db";
@@ -20,6 +28,428 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Failed to seed demo data:", error);
     }
   }
+  
+  // Content Management System (CMS) Routes
+  
+  // Pages API
+  app.get("/api/pages", async (req: Request, res: Response) => {
+    try {
+      // Normally we would get this from the database
+      const pages = [
+        {
+          id: 1,
+          title: "Anasayfa",
+          slug: "/",
+          content: "<h1>Hoş Geldiniz</h1><p>Bu bir içerik yönetim sistemi örneğidir.</p>",
+          isPublished: true,
+          metaTitle: "Anasayfa - SocialMaster",
+          metaDescription: "SocialMaster sosyal medya yönetim platformu",
+          userId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          title: "Hakkımızda",
+          slug: "/hakkimizda",
+          content: "<h1>Hakkımızda</h1><p>Şirketimiz hakkında bilgiler...</p>",
+          isPublished: true,
+          metaTitle: "Hakkımızda - SocialMaster",
+          metaDescription: "SocialMaster hakkında bilgi edinin",
+          userId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          title: "İletişim",
+          slug: "/iletisim",
+          content: "<h1>İletişim</h1><p>Bizimle iletişime geçin...</p>",
+          isPublished: true,
+          metaTitle: "İletişim - SocialMaster",
+          metaDescription: "SocialMaster ile iletişim kurun",
+          userId: 1,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+      res.json(pages);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get("/api/pages/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      // Here we would get the page from the database
+      const page = {
+        id: parseInt(id),
+        title: "Sayfa Başlığı",
+        slug: "/sayfa-adresi",
+        content: "<h1>Sayfa İçeriği</h1>",
+        isPublished: true,
+        metaTitle: "Meta Başlık",
+        metaDescription: "Meta Açıklama",
+        userId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      res.json(page);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/pages", async (req: Request, res: Response) => {
+    try {
+      const pageData = insertPageSchema.parse(req.body);
+      // Here we would create the page in the database
+      const newPage = {
+        id: 4,
+        ...pageData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      res.status(201).json(newPage);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.put("/api/pages/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const pageData = insertPageSchema.partial().parse(req.body);
+      // Here we would update the page in the database
+      const updatedPage = {
+        id: parseInt(id),
+        ...pageData,
+        updatedAt: new Date()
+      };
+      res.json(updatedPage);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.delete("/api/pages/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      // Here we would delete the page from the database
+      res.json({ success: true, message: `Page with ID ${id} deleted successfully` });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // Page Sections API
+  app.get("/api/page-sections", async (req: Request, res: Response) => {
+    try {
+      // Mock data for page sections
+      const sections = [
+        {
+          id: 1,
+          pageId: 1,
+          title: "Hero Section",
+          type: "hero",
+          content: "<h1>Sosyal Medya Yönetiminde Yeni Çağ</h1><p>Tüm hesaplarınızı tek yerden yönetin.</p>",
+          metadata: { bgColor: "#f9fafb", textAlign: "center" },
+          sortOrder: 0,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          pageId: 1,
+          title: "Özellikler",
+          type: "features",
+          content: "<h2>Özelliklerimiz</h2><ul><li>Kolay Kullanım</li><li>Analitik Raporlar</li><li>Zamanlama</li></ul>",
+          metadata: { columns: 3 },
+          sortOrder: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/page-sections", async (req: Request, res: Response) => {
+    try {
+      const sectionData = insertPageSectionSchema.parse(req.body);
+      // Here we would create the section in the database
+      const newSection = {
+        id: 3,
+        ...sectionData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      res.status(201).json(newSection);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.put("/api/page-sections/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const sectionData = insertPageSectionSchema.partial().parse(req.body);
+      // Here we would update the section in the database
+      const updatedSection = {
+        id: parseInt(id),
+        ...sectionData,
+        updatedAt: new Date()
+      };
+      res.json(updatedSection);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.delete("/api/page-sections/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      // Here we would delete the section from the database
+      res.json({ success: true, message: `Section with ID ${id} deleted successfully` });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // Menu Items API
+  app.get("/api/menu-items", async (req: Request, res: Response) => {
+    try {
+      // Mock data for menu items
+      const menuItems = [
+        {
+          id: 1,
+          parentId: null,
+          title: "Anasayfa",
+          url: "/",
+          location: "header",
+          icon: "home",
+          sortOrder: 0,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          parentId: null,
+          title: "Hakkımızda",
+          url: "/hakkimizda",
+          location: "header",
+          icon: "info",
+          sortOrder: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          parentId: null,
+          title: "İletişim",
+          url: "/iletisim",
+          location: "header",
+          icon: "mail",
+          sortOrder: 2,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 4,
+          parentId: null,
+          title: "Hakkımızda",
+          url: "/hakkimizda",
+          location: "footer",
+          icon: null,
+          sortOrder: 0,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 5,
+          parentId: null,
+          title: "Blog",
+          url: "/blog",
+          location: "footer",
+          icon: null,
+          sortOrder: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+      res.json(menuItems);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/menu-items", async (req: Request, res: Response) => {
+    try {
+      const menuItemData = insertMenuItemSchema.parse(req.body);
+      // Here we would create the menu item in the database
+      const newMenuItem = {
+        id: 6,
+        ...menuItemData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      res.status(201).json(newMenuItem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.put("/api/menu-items/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const menuItemData = insertMenuItemSchema.partial().parse(req.body);
+      // Here we would update the menu item in the database
+      const updatedMenuItem = {
+        id: parseInt(id),
+        ...menuItemData,
+        updatedAt: new Date()
+      };
+      res.json(updatedMenuItem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.delete("/api/menu-items/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      // Here we would delete the menu item from the database
+      res.json({ success: true, message: `Menu item with ID ${id} deleted successfully` });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // FAQ Items API
+  app.get("/api/faq-items", async (req: Request, res: Response) => {
+    try {
+      // Mock data for FAQ items
+      const faqItems = [
+        {
+          id: 1,
+          question: "SocialMaster nedir?",
+          answer: "SocialMaster, tüm sosyal medya hesaplarınızı tek bir platformdan yönetmenizi sağlayan bir araçtır.",
+          categoryId: null,
+          sortOrder: 0,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          question: "SocialMaster hangi sosyal medya platformlarını destekliyor?",
+          answer: "SocialMaster; Facebook, Instagram, Twitter, LinkedIn, Pinterest ve daha birçok platformu desteklemektedir.",
+          categoryId: null,
+          sortOrder: 1,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          question: "Ücretlendirme planları nasıl çalışır?",
+          answer: "SocialMaster, farklı ihtiyaçlara yönelik çeşitli ücretlendirme planları sunmaktadır. Ücretsiz deneme sürümünden başlayarak, kullanıcıların ihtiyaçlarına göre ölçeklenen planlarımız mevcuttur.",
+          categoryId: null,
+          sortOrder: 2,
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+      res.json(faqItems);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/faq-items", async (req: Request, res: Response) => {
+    try {
+      const faqItemData = insertFaqItemSchema.parse(req.body);
+      // Here we would create the FAQ item in the database
+      const newFaqItem = {
+        id: 4,
+        ...faqItemData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      res.status(201).json(newFaqItem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.put("/api/faq-items/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const faqItemData = insertFaqItemSchema.partial().parse(req.body);
+      // Here we would update the FAQ item in the database
+      const updatedFaqItem = {
+        id: parseInt(id),
+        ...faqItemData,
+        updatedAt: new Date()
+      };
+      res.json(updatedFaqItem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.delete("/api/faq-items/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      // Here we would delete the FAQ item from the database
+      res.json({ success: true, message: `FAQ item with ID ${id} deleted successfully` });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
   
   // Language routes
   app.get("/api/languages", async (req: Request, res: Response) => {
