@@ -224,6 +224,25 @@ export const insertSeoSettingsSchema = createInsertSchema(seoSettings).omit({
   updatedAt: true,
 });
 
+// Site Settings table
+export const siteSettings = pgTable("site_settings", {
+  id: serial("id").primaryKey(),
+  siteTitle: text("site_title").notNull(),
+  siteTagline: text("site_tagline"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  contactAddress: text("contact_address"),
+  logoUrl: text("logo_url"),
+  faviconUrl: text("favicon_url"),
+  defaultLanguage: text("default_language").default("tr"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSiteSettingsSchema = createInsertSchema(siteSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -254,3 +273,6 @@ export type InsertMedia = z.infer<typeof insertMediaSchema>;
 
 export type SeoSettings = typeof seoSettings.$inferSelect;
 export type InsertSeoSettings = z.infer<typeof insertSeoSettingsSchema>;
+
+export type SiteSettings = typeof siteSettings.$inferSelect;
+export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
