@@ -6,8 +6,12 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { db } from "./db";
 import { pool } from "./db";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
+
   // Initialize database with sample data if needed
   if (storage instanceof DatabaseStorage) {
     try {

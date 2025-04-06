@@ -211,7 +211,10 @@ export default function PostsPage() {
             </svg>
           </div>
           
-          <button className="btn btn-primary">
+          <button 
+            className="btn btn-primary"
+            onClick={() => window.location.href = "/posts/new"}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
@@ -235,7 +238,10 @@ export default function PostsPage() {
                 <h3 className="mt-4 text-xl font-medium text-slate-800">Gönderi bulunamadı</h3>
                 <p className="mt-2 text-slate-500 max-w-md mx-auto">Arama kriterlerinize uygun gönderi bulunamadı veya henüz gönderi eklenmemiş.</p>
                 <div className="mt-6">
-                  <button className="btn btn-primary">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => window.location.href = "/posts/new"}
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                     </svg>
