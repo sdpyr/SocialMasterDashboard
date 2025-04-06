@@ -10,6 +10,8 @@ export const users = pgTable("users", {
   fullName: text("full_name"),
   email: text("email"),
   avatar: text("avatar"),
+  role: text("role").default("user"),
+  subscriptionTier: text("subscription_tier").default("free"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -112,8 +112,8 @@ export default function AdminPanel() {
       username: user.username || '',
       email: user.email || '',
       fullName: user.fullName || '',
-      role: user.role || 'user',
-      subscriptionTier: user.subscriptionTier || 'free'
+      role: (user as any).role || 'user',
+      subscriptionTier: (user as any).subscriptionTier || 'free'
     });
     setOpenUserDialog(true);
   };
@@ -193,7 +193,12 @@ export default function AdminPanel() {
 
   const formatDate = (dateString: string | Date | null) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('tr-TR');
+    try {
+      return new Date(dateString).toLocaleDateString('tr-TR');
+    } catch (error) {
+      console.error('Invalid date format:', error);
+      return '-';
+    }
   };
 
   if (!isAdmin) {
@@ -493,11 +498,11 @@ export default function AdminPanel() {
                         <TableCell>{user.username}</TableCell>
                         <TableCell>{user.fullName || '-'}</TableCell>
                         <TableCell>
-                          {user.role === 'admin' ? (
+                          {(user as any).role === 'admin' ? (
                             <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
                               Admin
                             </span>
-                          ) : user.role === 'moderator' ? (
+                          ) : (user as any).role === 'moderator' ? (
                             <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
                               Moderatör
                             </span>
@@ -508,11 +513,11 @@ export default function AdminPanel() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {user.subscriptionTier === 'premium' ? (
+                          {(user as any).subscriptionTier === 'premium' ? (
                             <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
                               Premium
                             </span>
-                          ) : user.subscriptionTier === 'pro' ? (
+                          ) : (user as any).subscriptionTier === 'pro' ? (
                             <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                               Pro
                             </span>
