@@ -183,10 +183,10 @@ export default function Sidebar() {
           {openMenus.admin && (
             <div className="ml-4 space-y-1 pt-1">
               <NavItem 
-                href="/admin-panel-new" 
+                href="/admin" 
                 icon={PanelRight} 
                 label="Admin Panel" 
-                active={location === "/admin-panel-new"}
+                active={location === "/admin"}
               />
               <NavItem 
                 href="/blog" 

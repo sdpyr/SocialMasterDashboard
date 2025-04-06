@@ -10,10 +10,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export default function Header() {
+type HeaderProps = {
+  title?: string;
+};
+
+export default function Header({ title }: HeaderProps) {
   return (
     <header className="sticky top-0 z-10 h-16 border-b bg-background flex items-center px-6">
       <div className="flex-1 flex justify-between items-center">
+        {title && <h2 className="text-xl font-semibold mr-6">{title}</h2>}
+
         <div className="flex items-center w-96">
           <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
