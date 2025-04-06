@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'wouter';
 import TabNavigation from '@/components/layout/TabNavigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -228,7 +229,7 @@ export default function AdminPanel() {
       </div>
       
       <Tabs defaultValue="ui-settings">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 flex-wrap">
           <TabsTrigger value="ui-settings">Arayüz Ayarları</TabsTrigger>
           <TabsTrigger value="users">Kullanıcı Yönetimi</TabsTrigger>
           <TabsTrigger value="social-accounts">Sosyal Medya</TabsTrigger>
@@ -238,6 +239,38 @@ export default function AdminPanel() {
           <TabsTrigger value="plans">Ücretli Planlar</TabsTrigger>
           <TabsTrigger value="pages">Sayfalar</TabsTrigger>
         </TabsList>
+        
+        {/* Admin Panel Alt Sayfalarına Linkler */}
+        <div className="mb-6 flex flex-wrap gap-3">
+          <h3 className="w-full text-sm font-semibold mb-2">Alt Sayfalara Hızlı Erişim:</h3>
+          <Link to="/admin/appearance" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Görünüm
+          </Link>
+          <Link to="/admin/blog" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Blog
+          </Link>
+          <Link to="/admin/backup" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Yedekleme
+          </Link>
+          <Link to="/admin/language" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Dil Ayarları
+          </Link>
+          <Link to="/admin/media" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Medya
+          </Link>
+          <Link to="/admin/pages" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Sayfalar
+          </Link>
+          <Link to="/admin/seo" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            SEO
+          </Link>
+          <Link to="/admin/templates" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Şablonlar
+          </Link>
+          <Link to="/admin/general" className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+            Genel Ayarlar
+          </Link>
+        </div>
         
         <TabsContent value="ui-settings">
           <Card>

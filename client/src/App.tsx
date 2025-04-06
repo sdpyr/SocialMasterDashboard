@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 
-// Pages
+// Main Pages
 import Dashboard from "@/pages/Dashboard";
 import AccountsPage from "@/pages/AccountsPage";
 import PostsPage from "@/pages/PostsPage";
@@ -15,6 +15,17 @@ import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import AdminPanel from "@/pages/admin-panel-new";
 import NotFound from "@/pages/not-found";
+
+// Admin Panel Pages
+import AppearancePage from "@/pages/appearance-page";
+import BlogPage from "@/pages/blog-page";
+import BackupPage from "@/pages/backup-page";
+import LanguageSettingsPage from "@/pages/language-settings-page";
+import MediaPage from "@/pages/media-page";
+import PagesPage from "@/pages/pages-page";
+import SeoSettingsPage from "@/pages/seo-settings-page";
+import TemplatesPage from "@/pages/templates-page";
+import GeneralSettingsPage from "@/pages/general-settings-page";
 
 // Main Layout Component
 function Layout({ children }: { children: React.ReactNode }) {
@@ -72,6 +83,17 @@ function Router() {
         
         {/* Admin Panel */}
         <Route path="/admin" component={AdminPanel} />
+        
+        {/* Admin Panel Alt Sayfaları */}
+        <Route path="/admin/appearance" component={AppearancePage} />
+        <Route path="/admin/blog" component={BlogPage} />
+        <Route path="/admin/backup" component={BackupPage} />
+        <Route path="/admin/language" component={LanguageSettingsPage} />
+        <Route path="/admin/media" component={MediaPage} />
+        <Route path="/admin/pages" component={PagesPage} />
+        <Route path="/admin/seo" component={SeoSettingsPage} />
+        <Route path="/admin/templates" component={TemplatesPage} />
+        <Route path="/admin/general" component={GeneralSettingsPage} />
         
         {/* Fallback to 404 */}
         <Route component={NotFound} />

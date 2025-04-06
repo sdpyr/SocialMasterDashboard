@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Backup, InsertBackup, insertBackupSchema } from "@shared/schema";
+import { type Backup, type InsertBackup, insertBackupSchema } from "@shared/schema";
 import { apiRequest, queryClient, getQueryFn } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import DashboardLayout from "@/components/dashboard/layout";
 import {
   Dialog,
   DialogContent,
