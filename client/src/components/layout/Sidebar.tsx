@@ -13,7 +13,8 @@ import {
   Globe,
   LayoutGrid,
   BookOpen,
-  PanelRight
+  PanelRight,
+  Mic
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -127,6 +128,12 @@ export default function Sidebar() {
                 icon={BarChart3} 
                 label="Analitik" 
                 active={location === "/analytics"}
+              />
+              <NavItem 
+                href="/voice" 
+                icon={Mic} 
+                label="Sesli Akış" 
+                active={location === "/voice"}
               />
               <NavItem 
                 href="/messages" 

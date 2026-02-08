@@ -28,6 +28,7 @@ import PagesPage from "@/pages/pages-page";
 import SeoSettingsPage from "@/pages/seo-settings-page";
 import TemplatesPage from "@/pages/templates-page";
 import GeneralSettingsPage from "@/pages/general-settings-page";
+import VoiceSocialPage from "@/pages/voice-social";
 
 // Main Layout Component
 function Layout({ children }: { children: React.ReactNode }) {
@@ -42,6 +43,7 @@ function Layout({ children }: { children: React.ReactNode }) {
     if (location.startsWith("/drafts")) return "Taslaklar";
     if (location.startsWith("/analytics")) return "Analitik";
     if (location.startsWith("/settings")) return "Ayarlar";
+    if (location.startsWith("/voice")) return "Sesli Paylaşım";
     return "SocialMaster";
   };
 
@@ -83,6 +85,7 @@ function Router() {
             <Route path="/posts" component={PostsPage} />
             <Route path="/schedule" component={PostsPage} />
             <Route path="/drafts" component={PostsPage} />
+            <Route path="/voice" component={VoiceSocialPage} />
             
             {/* Analytics */}
             <Route path="/analytics" component={AnalyticsPage} />
